@@ -59,7 +59,7 @@
          Changes take effect immediately on page reload.            */
       --george-gap:      0vh;   /* blank scroll space between anim-end and credit    */
       --george-credit-h: 60vh;  /* height of the footer credit zone                  */
-      --george-stack-y:  120px; /* shift the row stack downward (+px moves it down)  */
+      --george-stack-y:  0px;   /* shift the row stack downward (+px moves it down)  */
     }
 
     html {
@@ -748,8 +748,6 @@
           <span class="george-row">George Orwell</span>
           <span class="george-row">George Orwell</span>
           <span class="george-row">George Orwell</span>
-          <span class="george-row">George Orwell</span>
-          <span class="george-row">George Orwell</span>
         </div>
       </div>
       <!-- Free-scroll zone: visible after sticky releases -->
@@ -783,7 +781,7 @@
 
     var georgeSection   = null;
     var georgeRows      = [];
-    var georgeCenter    = 4; /* middle of 9 lines (0-based) */
+    var georgeCenter    = 3; /* middle of 7 lines (0-based) */
     var georgeSpread    = 0;
     var georgeStackY    = 0; /* px offset from --george-stack-y, applied to every row */
     var georgeScrollDir = 0; /* +1 = scrolling down, -1 = up */
@@ -1192,8 +1190,8 @@
       georgeSection = document.querySelector('.s-george');
       if (georgeSection) {
         georgeRows   = [].slice.call(georgeSection.querySelectorAll('.george-row'));
-        georgeSpread = georgeRows.length
-          ? Math.round(georgeRows[0].offsetHeight * 1.1)
+        georgeSpread = georgeRows.length > 1
+          ? Math.floor((window.innerHeight - georgeRows[0].offsetHeight) / (georgeRows.length - 1) * 0.93)
           : 0;
         /* Read --george-stack-y from CSS (px number, no unit in parseInt) */
         var stackYStr = getComputedStyle(document.documentElement)
