@@ -1181,12 +1181,6 @@
           }
         }, { threshold: 0.95 }).observe(dtSection);
 
-        var dtFontOpen = false;
-        dtSection.addEventListener('click', function () {
-          dtFontOpen = !dtFontOpen;
-          var f = dtFontOpen ? 'var(--font-open)' : 'var(--font)';
-          dtLines.forEach(function (line) { line.style.fontFamily = f; });
-        });
       }
 
       georgeSection = document.querySelector('.s-george');
@@ -1241,7 +1235,7 @@
           var cy  = e.clientY - r.top;
 
           /* pick a random pair and randomise which word goes at cursor */
-          var PAIRS = [['white','black'],['right','wrong'],['left','right'],['up','down'],['yes','no']];
+          var PAIRS = [['white','black'],['right','wrong'],['left','right'],['up','down'],['yes','no'],['high','low']];
           var pair   = PAIRS[Math.floor(Math.random() * PAIRS.length)];
           var first  = Math.random() < 0.5 ? pair[0] : pair[1];
           var second = first === pair[0] ? pair[1] : pair[0];
