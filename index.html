@@ -105,25 +105,13 @@
     .s-intro {
       background-color: var(--dark);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-    }
-
-    .s-intro .bg-army {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center top;
-      opacity: 0.35;
+      gap: clamp(16px, 3vw, 48px);
     }
 
     .s-intro .eye-top {
-      position: absolute;
-      top: clamp(16px, 2.3vw, 36px);
-      left: 50%;
-      transform: translateX(-50%);
       width: var(--eye-w);
       height: auto;
       z-index: 2;
@@ -239,15 +227,6 @@
     ═══════════════════════════════════════════════ */
     .s-who {
       background-color: var(--dark);
-    }
-
-    .s-who .eye-center {
-      position: absolute;
-      top: 17.04%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: var(--eye-w);
-      height: auto;
     }
 
     .s-who .quote {
@@ -533,6 +512,15 @@
       opacity: 0;
       pointer-events: none;
     }
+
+    /* ─── Year typing cursor ────────────────────── */
+    .year-cursor {
+      animation: bb-blink 0.8s step-end infinite;
+    }
+    @keyframes bb-blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
   </style>
 </head>
 <body>
@@ -544,7 +532,7 @@
     <img class="eye"
          src="images/eye.svg"
          alt="">
-    <h2>Welcome To The Year Of 1984</h2>
+    <h2>Welcome To The Year Of <span class="year-anim">1984</span><span class="year-cursor">|</span></h2>
   </section>
 
   <!-- ════════════════════════════════════════════
@@ -598,9 +586,6 @@
        7. WHO CONTROLS THE FUTURE
   ════════════════════════════════════════════ -->
   <section class="s-who">
-    <img class="eye-center"
-         src="images/eye.svg"
-         alt="">
     <p class="quote">Who controls the past controls the future. Who controls the present controls the past.</p>
   </section>
 
@@ -915,6 +900,47 @@
       });
     }
 
+    function setupYearAnim() {
+      var el = document.querySelector('.year-anim');
+      if (!el) return;
+
+      var YEAR_A     = '1984';
+      var YEAR_B     = String(new Date().getFullYear());
+      var PAUSE      = 1800;
+      var BS_DELAY   =   80;
+      var TYPE_DELAY =  110;
+
+      function transition(from, to, cb) {
+        var shared = 0;
+        while (shared < from.length && shared < to.length && from[shared] === to[shared]) shared++;
+        var steps = [];
+        for (var i = from.length; i > shared; i--)
+          steps.push({ text: from.slice(0, i - 1), delay: BS_DELAY });
+        for (var j = shared + 1; j <= to.length; j++)
+          steps.push({ text: to.slice(0, j), delay: TYPE_DELAY });
+        var idx = 0;
+        (function run() {
+          if (idx >= steps.length) { cb(); return; }
+          var s = steps[idx++];
+          el.textContent = s.text;
+          setTimeout(run, s.delay);
+        }());
+      }
+
+      (function loop() {
+        el.textContent = YEAR_A;
+        setTimeout(function () {
+          transition(YEAR_A, YEAR_B, function () {
+            setTimeout(function () {
+              transition(YEAR_B, YEAR_A, function () {
+                setTimeout(loop, PAUSE);
+              });
+            }, PAUSE);
+          });
+        }, PAUSE);
+      }());
+    }
+
     function init() {
       /* Replace every eye <img> with an inline-SVG <div> */
       [].slice.call(
@@ -993,6 +1019,16 @@
         });
       }
 
+      /* Randomise static eye positions in s-darkness-2 */
+      var dark2 = document.querySelector('.s-darkness-2');
+      if (dark2) {
+        [].slice.call(dark2.querySelectorAll('.eye-icon')).forEach(function (eye) {
+          eye.style.left = (8 + Math.random() * 84) + '%';
+          eye.style.top  = (8 + Math.random() * 84) + '%';
+        });
+      }
+
+      setupYearAnim();
       setupOrientation();
       setupStamps();
       requestAnimationFrame(tick);
