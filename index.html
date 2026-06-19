@@ -875,7 +875,7 @@
     }
 
     function setupStamps() {
-      var STAMP_SELS = ['.s-welcome', '.s-intro', '.s-army', '.s-war', '.s-who', '.s-darkness-2'];
+      var STAMP_SELS = ['.s-welcome', '.s-intro', '.s-army', '.s-who', '.s-darkness-2'];
       var SKIP = 'a, button, input, select, textarea, [role="button"], label';
 
       STAMP_SELS.forEach(function (sel) {
@@ -894,6 +894,29 @@
           states.push({ wrap: wrap, pupilG: wrap.querySelector('.eye-p'), tx: 0, ty: 0 });
         });
       });
+
+      var warSec = document.querySelector('.s-war');
+      if (warSec) {
+        var WAR_WORDS = ['war', 'peace', 'freedom', 'slavery', 'ignorance', 'strength'];
+        var warCount  = 0;
+
+        warSec.addEventListener('click', function (e) {
+          if (e.target.closest(SKIP)) return;
+          var r    = warSec.getBoundingClientRect();
+          var el   = document.createElement('p');
+          el.className        = 'text-stamp';
+          el.style.color      = 'var(--light)';
+          el.style.fontStyle  = 'normal';
+          /* cycle: word → is → word → (repeat) */
+          el.textContent = (warCount % 3 === 1)
+            ? 'is'
+            : WAR_WORDS[Math.floor(Math.random() * WAR_WORDS.length)];
+          warCount++;
+          el.style.left = (e.clientX - r.left) + 'px';
+          el.style.top  = (e.clientY - r.top)  + 'px';
+          warSec.appendChild(el);
+        });
+      }
 
       ['.s-forever-1', '.s-forever-2'].forEach(function (sel) {
         var sec = document.querySelector(sel);
