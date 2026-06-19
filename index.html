@@ -53,6 +53,13 @@
 
       --eye-w: clamp(70px, 14.55vw, 220px);
       --section-h: 100vh;
+
+      /* ── George Orwell section tuning ───────────────────────────
+         Adjust these three values to fine-tune the footer layout.
+         Changes take effect immediately on page reload.            */
+      --george-gap:      0vh;   /* blank scroll space between anim-end and credit    */
+      --george-credit-h: 60vh;  /* height of the footer credit zone                  */
+      --george-stack-y:  120px; /* shift the row stack downward (+px moves it down)  */
     }
 
     html {
@@ -390,14 +397,15 @@
     }
 
     .george-inner {
-      height: 600vh;
+      /* 300vh animation zone + tunable gap + tunable credit zone */
+      height: calc(300vh + var(--george-gap) + var(--george-credit-h));
       position: relative;
     }
 
-    /* Sticky containing block: 400vh. Scene sticks until scrollTop 300vh,
-       then releases so blank space + credit scroll into view below. */
+    /* Sticky containing block: 300vh → sticky releases at 200vh (= animation
+       end), so the credit appears immediately after the converge completes. */
     .george-anim-zone {
-      height: 400vh;
+      height: 300vh;
     }
 
     .george-scene {
@@ -407,18 +415,23 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      /* overflow visible: rows that extend past the 100vh box are clipped by
+         the viewport itself, so removing hidden here is safe and lets the
+         downward-shifted stack breathe without being clipped from below. */
     }
 
     .george-blank-zone {
-      height: 100vh;
+      height: var(--george-gap);
     }
 
     .george-credit-zone {
-      height: 100vh;
+      height: var(--george-credit-h);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 1.5rem;
+      text-align: center;
     }
 
     .george-row {
@@ -676,9 +689,9 @@
   ════════════════════════════════════════════ -->
   <section class="s-george">
     <div class="george-inner">
-      <!-- Animation zone: 400vh sticky containing block.
-           Scene sticks here, converge plays 0→200vh, frozen 200→300vh,
-           then scene releases at 300vh letting the zones below scroll in. -->
+      <!-- Animation zone: 300vh sticky containing block.
+           Scene sticks for exactly 200vh (animation travel), releases at
+           max scroll — credit slides in from below immediately after. -->
       <div class="george-anim-zone">
         <div class="george-scene">
           <span class="george-row">George Orwell</span>
@@ -695,7 +708,9 @@
       <!-- Free-scroll zone: visible after sticky releases -->
       <div class="george-blank-zone"></div>
       <div class="george-credit-zone">
-        <p class="george-credit">Designed &amp; Developed by <a href="#">Lina Moreno</a> in 1984</p>
+        <p class="george-credit">Inspired by the novel <em><a href="https://en.wikipedia.org/wiki/Nineteen_Eighty-Four" target="_blank" rel="noopener">Nineteen Eighty-Four</a></em> by <a href="https://en.wikipedia.org/wiki/George_Orwell" target="_blank" rel="noopener">George Orwell</a>.</p>
+        <p class="george-credit">Design by <a href="https://linamoreno.com" target="_blank" rel="noopener">Lina Moreno</a>, developed with Claude.</p>
+        <p class="george-credit">Font by <a href="https://velvetyne.fr" target="_blank" rel="noopener">Raphaël Bastide</a>.</p>
       </div>
     </div>
   </section>
@@ -719,10 +734,11 @@
     var dtCenter  = 3;     /* index of middle line (0-based, 7 lines → 3) */
     var dtSpread  = 0;     /* px between adjacent line centres at full fan */
 
-    var georgeSection  = null;
-    var georgeRows     = [];
-    var georgeCenter   = 4; /* middle of 9 lines (0-based) */
-    var georgeSpread   = 0;
+    var georgeSection   = null;
+    var georgeRows      = [];
+    var georgeCenter    = 4; /* middle of 9 lines (0-based) */
+    var georgeSpread    = 0;
+    var georgeStackY    = 0; /* px offset from --george-stack-y, applied to every row */
     var georgeScrollDir = 0; /* +1 = scrolling down, -1 = up */
 
 /* Inline SVG: static eye body + movable pupil in its own <g class="eye-p"> */
@@ -915,9 +931,7 @@
       if (!georgeSection || !georgeRows.length) return;
       var r = georgeSection.getBoundingClientRect();
       if (r.top >= window.innerHeight || r.bottom <= 0) return;
-      /* Cap animation at 2× viewport height (original 200vh travel).
-         Extra scroll beyond that shows blank space + credit without
-         re-opening the spread animation. */
+      /* Cap animation at 2× viewport height (= 200vh travel). */
       var animScrollable = 2 * georgeSection.clientHeight;
       var progress = animScrollable > 0
         ? Math.min(1, Math.max(0, georgeSection.scrollTop / animScrollable))
@@ -925,7 +939,7 @@
       /* inv: 1 = fully spread (scroll start), 0 = fully stacked (scroll end) */
       var inv = 1 - progress;
       georgeRows.forEach(function (row, i) {
-        var offset = (i - georgeCenter) * georgeSpread * inv;
+        var offset = (i - georgeCenter) * georgeSpread * inv + georgeStackY;
         row.style.transform = 'translateY(' + offset.toFixed(1) + 'px)';
       });
     }
@@ -1053,9 +1067,13 @@
         georgeSpread = georgeRows.length
           ? Math.round(georgeRows[0].offsetHeight * 1.1)
           : 0;
-        /* Set initial spread positions so first paint is already correct */
+        /* Read --george-stack-y from CSS (px number, no unit in parseInt) */
+        var stackYStr = getComputedStyle(document.documentElement)
+                          .getPropertyValue('--george-stack-y').trim();
+        georgeStackY  = parseFloat(stackYStr) || 0;
+        /* Set initial spread positions (inv=1) with downward stack offset */
         georgeRows.forEach(function (row, i) {
-          var offset = (i - georgeCenter) * georgeSpread;
+          var offset = (i - georgeCenter) * georgeSpread + georgeStackY;
           row.style.transform = 'translateY(' + offset.toFixed(1) + 'px)';
         });
         /* Track outer scroll direction for the IO reset below */
