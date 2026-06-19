@@ -150,9 +150,10 @@
     }
 
     .s-welcome h2 {
-      font-size: var(--fs-h2);
+      font-size: var(--fs-h1);
+      font-family: var(--font-open);
       font-weight: 400;
-      line-height: 0.908;
+      line-height: 0.888;
       color: var(--dark);
       text-align: center;
     }
@@ -823,6 +824,13 @@
 
       var aprilSec = document.querySelector('.s-april');
       if (aprilSec) {
+        var MONTHS     = ['January','February','March','April','May','June',
+                          'July','August','September','October','November','December'];
+        var HOUR_WORDS = ['midnight','one','two','three','four','five','six',
+                          'seven','eight','nine','ten','eleven','noon',
+                          'thirteen','fourteen','fifteen','sixteen','seventeen',
+                          'eighteen','nineteen','twenty','twenty-one','twenty-two','twenty-three'];
+
         function currentTime() {
           var now = new Date();
           return String(now.getHours()).padStart(2, '0') + ':'
@@ -836,8 +844,19 @@
           for (var i = 0; i < stamps.length; i++) stamps[i].textContent = t;
         }, 1000);
 
+        var aprilClicked = false;
         aprilSec.addEventListener('click', function (e) {
           if (e.target.closest(SKIP)) return;
+
+          if (!aprilClicked) {
+            aprilClicked = true;
+            var now   = new Date();
+            var t1    = aprilSec.querySelector('.t1');
+            var t2    = aprilSec.querySelector('.t2');
+            if (t1) t1.textContent = t1.textContent.replace('April', MONTHS[now.getMonth()]);
+            if (t2) t2.textContent = t2.textContent.replace('thirteen', HOUR_WORDS[now.getHours()]);
+          }
+
           var r  = aprilSec.getBoundingClientRect();
           var el = document.createElement('p');
           el.className = 'text-stamp april-time';
