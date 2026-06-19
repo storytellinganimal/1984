@@ -239,12 +239,16 @@
     .s-who .quote {
       position: absolute;
       left: 4.23%;
-      top: 47.25%;
-      width: 76.06%;
+      top: 9.57%;
+      width: 75.46%;
       font-size: var(--fs-h3);
       font-weight: 400;
       line-height: 1;
       color: var(--light);
+    }
+
+    .s-who .future-word {
+      transition: opacity 0.35s ease;
     }
 
     /* ═══════════════════════════════════════════════
@@ -612,7 +616,7 @@
        7. WHO CONTROLS THE FUTURE
   ════════════════════════════════════════════ -->
   <section class="s-who">
-    <p class="quote">Who controls the past controls the future. Who controls the present controls the past.</p>
+    <p class="quote">Who controls the past controls the <span class="future-word">future</span>. Who controls the present controls the past.</p>
   </section>
 
   <!-- ════════════════════════════════════════════
@@ -815,7 +819,7 @@
     }
 
     function setupStamps() {
-      var STAMP_SELS = ['.s-welcome', '.s-intro', '.s-who', '.s-darkness-2'];
+      var STAMP_SELS = ['.s-welcome', '.s-intro', '.s-darkness-2'];
       var SKIP = 'a, button, input, select, textarea, [role="button"], label';
 
       STAMP_SELS.forEach(function (sel) {
@@ -834,6 +838,29 @@
           states.push({ wrap: wrap, pupilG: wrap.querySelector('.eye-p'), tx: 0, ty: 0 });
         });
       });
+
+      /* s-who: fade "future" 20% per click; stamp eyes once it hits 0 */
+      var whoSec      = document.querySelector('.s-who');
+      var futureWord  = whoSec && whoSec.querySelector('.future-word');
+      if (whoSec && futureWord) {
+        var futureOpacity = 1;
+        whoSec.addEventListener('click', function (e) {
+          if (e.target.closest(SKIP)) return;
+          if (futureOpacity > 0) {
+            futureOpacity = Math.max(0, Math.round((futureOpacity - 0.2) * 10) / 10);
+            futureWord.style.opacity = futureOpacity;
+          } else {
+            var r    = whoSec.getBoundingClientRect();
+            var wrap = document.createElement('div');
+            wrap.className      = 'eye-stamp';
+            wrap.style.left     = (e.clientX - r.left) + 'px';
+            wrap.style.top      = (e.clientY - r.top)  + 'px';
+            wrap.innerHTML      = EYE_HTML;
+            whoSec.appendChild(wrap);
+            states.push({ wrap: wrap, pupilG: wrap.querySelector('.eye-p'), tx: 0, ty: 0 });
+          }
+        });
+      }
 
       var warSec = document.querySelector('.s-war');
       if (warSec) {
