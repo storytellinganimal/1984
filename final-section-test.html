@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Final Section Test</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /*
+      OUTER SCROLLER: html
+      ─────────────────────
+      scroll-snap-type: y mandatory keeps every section snapping cleanly.
+      The George Orwell section participates in this snap system exactly like
+      the others — it snaps into view full-screen.  The trick is that its own
+      overflow-y: auto creates a NESTED scroll context, so after the outer snap
+      parks it in view you can continue scrolling freely WITHIN it (blank space
+      → credit) without the outer mandatory snap interfering.
+    */
+    html {
+      height: 100vh;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: #312e2e;
+      font-family: 'Arial', sans-serif;
+      color: #e9e9e9;
+    }
+
+    /* ── Shared: every snap section ──────────────────── */
+    section {
+      height: 100vh;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;  /* never skip on fast swipe */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(18px, 4vw, 48px);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── Placeholder sections ────────────────────────── */
+    .s-a { background: #1a1a2e; }
+    .s-b { background: #16213e; }
+    .s-c { background: #0f3460; }
+
+    /* ── George Orwell section ─────────────────────────
+       Outer snap: this element is 100vh, so the outer
+       mandatory snap treats it exactly like the others.
+       overflow-y: auto: creates a nested scroll context.
+       After the outer snap parks this section in view,
+       all subsequent scroll events go to the INNER scroll
+       (george-inner) until it bottoms out, then the outer
+       scroll would take over — but there's nothing below,
+       so the user is simply done.
+    ────────────────────────────────────────────────── */
+    .s-george {
+      /* participates in outer snap */
+      height: 100vh;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+
+      /* enables free inner scroll */
+      overflow-y: auto;
+
+      /* reset display — the inner div handles layout */
+      display: block;
+      background: #312e2e;
+    }
+
+    /*
+      Inner track: 280vh total
+        100vh  — George Orwell name (first viewport)
+        130vh  — blank space
+         50vh  — credit zone
+    */
+    .george-inner {
+      height: 280vh;
+    }
+
+    /* The name fills exactly the first 100vh of the inner track,
+       so when the outer snap parks george at the top, this is
+       what you see: George Orwell centered, full-screen. */
+    .george-name {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(32px, 8.6vw, 130px);
+      font-weight: 400;
+      line-height: 0.9;
+      text-align: center;
+      padding: 0 10%;
+    }
+
+    /* Blank space — the "past it" zone the user scrolls through */
+    .george-blank {
+      height: 130vh;
+    }
+
+    /* Credit lives at the bottom of the inner track */
+    .george-credit {
+      height: 50vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(9px, 0.9vw, 13px);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(233, 233, 233, 0.45);
+    }
+
+    /* Small scroll-hint arrow, visible only when george is in view */
+    .george-hint {
+      position: sticky;
+      bottom: 1.5rem;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0.3;
+      font-size: 1.4rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Three placeholder snap sections ─────────────────────── -->
+  <section class="s-a">Section A</section>
+  <section class="s-b">Section B</section>
+  <section class="s-c">Section C</section>
+
+  <!--
+    George Orwell section
+    ─────────────────────────────────────────────────────────
+    WHAT HAPPENS:
+    1. Outer mandatory snap parks this section at the top of
+       the viewport — you see "George Orwell" centered.
+    2. Keep scrolling → events go to the INNER scroll
+       (overflow-y: auto on .s-george).  George slides off,
+       blank space fills the screen.
+    3. Continue scrolling → credit appears below the blank space.
+    4. Scroll back up within the inner track → George returns.
+    5. When inner scrollTop hits 0, scrolling up exits back to
+       Section C via the outer mandatory snap.  Clean.
+  -->
+  <section class="s-george">
+    <div class="george-inner">
+
+      <div class="george-name">George Orwell</div>
+
+      <div class="george-blank"></div>
+
+      <div class="george-credit">
+        Designed &amp; Developed by Lina Moreno in 1984
+      </div>
+
+    </div>
+
+    <!-- hint arrow fades in when section is snapped; optional in prod -->
+    <div class="george-hint">↓</div>
+  </section>
+
+  <script>
+    /*
+      Optional: reset the inner scrollTop every time the outer snap
+      brings George into view FROM ABOVE (i.e. scrolling downward).
+      This ensures the name is always the first thing you see when
+      landing on this section fresh.  When coming back UP from a
+      previous visit the scrollTop is preserved intentionally so
+      you re-enter wherever you left off.
+    */
+    var georgeEl  = document.querySelector('.s-george');
+    var lastHtmlY = 0;
+    var scrollDir = 0;
+
+    window.addEventListener('wheel', function(e) {
+      scrollDir = e.deltaY > 0 ? 1 : -1;
+    }, { passive: true });
+
+    var ts = 0;
+    window.addEventListener('touchstart', function(e) {
+      ts = e.touches[0].clientY;
+    }, { passive: true });
+    window.addEventListener('touchmove', function(e) {
+      scrollDir = e.touches[0].clientY < ts ? 1 : -1;
+    }, { passive: true });
+
+    new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting && scrollDir > 0) {
+        georgeEl.scrollTop = 0;   /* entering from above → reset to name */
+      }
+    }, { threshold: 0.95 }).observe(georgeEl);
+  </script>
+
+</body>
+</html>

@@ -860,6 +860,8 @@
           var el = document.createElement('p');
           el.className = 'text-stamp april-time';
           el.style.fontFamily = 'var(--font-open)';
+          el.style.textAlign  = 'center';
+          el.style.transform  = 'translate(-50%, -50%)';
           el.textContent = currentTime();
           el.style.left = (e.clientX - r.left) + 'px';
           el.style.top  = (e.clientY - r.top)  + 'px';
@@ -876,6 +878,8 @@
           var r = sec.getBoundingClientRect();
           var el = document.createElement('p');
           el.className = 'text-stamp';
+          el.style.textAlign = 'center';
+          el.style.transform = 'translate(-50%, -50%)';
           el.textContent = '— for ever.';
           el.style.left = (e.clientX - r.left) + 'px';
           el.style.top  = (e.clientY - r.top)  + 'px';
