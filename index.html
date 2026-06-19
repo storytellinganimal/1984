@@ -1166,12 +1166,10 @@
         states.push({ wrap: wrap, pupilG: wrap.querySelector('.eye-p'), tx: 0, ty: 0 });
       });
 
-      if (!TOUCH) {
-        document.addEventListener('mousemove', function (e) {
-          mx = e.clientX;
-          my = e.clientY;
-        });
-      }
+      document.addEventListener('mousemove', function (e) {
+        mx = e.clientX;
+        my = e.clientY;
+      });
 
       /* Doublethink fan — measure spread after fonts load */
       dtSection = document.querySelector('.s-doublethink');
