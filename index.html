@@ -323,6 +323,7 @@
     ═══════════════════════════════════════════════ */
     .s-darkness {
       background-color: var(--dark);
+      color: var(--light);
     }
 
     .s-darkness .dt-quote {
@@ -339,6 +340,32 @@
     .s-darkness .dt-quote .word {
       font-weight: 700;
       text-transform: uppercase;
+    }
+
+    /* "white" + "black" stamped at random positions on each click.
+       color: inherit picks up the section's current foreground so all
+       stamps flip automatically when the section inverts. */
+    .s-darkness .wb-stamp {
+      position: absolute;
+      font-size: var(--fs-h3);
+      font-weight: 400;
+      line-height: 1;
+      color: inherit;
+      pointer-events: none;
+      white-space: nowrap;
+      transform: translate(-50%, -50%);
+    }
+
+    .s-darkness .wb-stamp.is-white { font-family: var(--font-open); }
+    .s-darkness .wb-stamp.is-black { font-family: var(--font); }
+
+    .s-darkness.inverted {
+      background-color: var(--light);
+      color: var(--dark);
+    }
+
+    .s-darkness.inverted .dt-quote {
+      color: var(--dark);
     }
 
     .s-darkness .eye-icon,
@@ -1127,6 +1154,40 @@
       if (nodarkSec) {
         nodarkSec.addEventListener('click', function () {
           nodarkSec.classList.toggle('inverted');
+        });
+      }
+
+      /* Doublethink quote: on each click one word lands at the cursor,
+         the other lands nearby at a small random offset */
+      var darknessSec = document.querySelector('.s-darkness');
+      if (darknessSec) {
+        darknessSec.addEventListener('click', function (e) {
+          var r   = darknessSec.getBoundingClientRect();
+          var cx  = e.clientX - r.left;
+          var cy  = e.clientY - r.top;
+
+          /* randomise which word goes at cursor, which goes nearby */
+          var first  = Math.random() < 0.5 ? 'white' : 'black';
+          var second = first === 'white' ? 'black' : 'white';
+
+          /* offset the secondary word in a random direction, ~100–180px away */
+          var angle = Math.random() * Math.PI * 2;
+          var dist  = 100 + Math.random() * 80;
+          var ox    = Math.cos(angle) * dist;
+          var oy    = Math.sin(angle) * dist;
+
+          var mkStamp = function (word, x, y) {
+            var el = document.createElement('p');
+            el.className   = 'wb-stamp ' + (word === 'white' ? 'is-white' : 'is-black');
+            el.textContent = word;
+            el.style.left  = x + 'px';
+            el.style.top   = y + 'px';
+            darknessSec.appendChild(el);
+          };
+
+          mkStamp(first,  cx,      cy);
+          mkStamp(second, cx + ox, cy + oy);
+          darknessSec.classList.toggle('inverted');
         });
       }
 
