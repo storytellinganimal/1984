@@ -311,6 +311,9 @@
       overflow-y: auto; /* inner scroll drives fan; outer snap still works */
     }
 
+    .s-doublethink.inverted { background-color: var(--light); }
+    .s-doublethink.inverted .dt-line { color: var(--dark); }
+
     /* 300vh inner track gives 200vh of scroll travel for the fan animation */
     .dt-inner {
       height: 300vh;
@@ -1230,6 +1233,9 @@
           }
         }, { threshold: 0.95 }).observe(dtSection);
 
+        dtSection.addEventListener('click', function () {
+          dtSection.classList.toggle('inverted');
+        });
       }
 
       georgeSection = document.querySelector('.s-george');
