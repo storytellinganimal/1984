@@ -277,7 +277,7 @@
       position: absolute;
       left: 4.23%;
       top: 14.15%;
-      width: 29.43%;
+      width: 40%;
       font-size: var(--fs-h3);
       font-weight: 400;
       line-height: 1;
@@ -666,7 +666,7 @@
        8. APRIL  ·  opening line
   ════════════════════════════════════════════ -->
   <section class="s-april">
-    <p class="t1">It was a bright cold day in April,</p>
+    <p class="t1">It was a <span class="april-bright">bright</span> <span class="april-cold">cold</span> <span class="april-daytime">day</span> in <span class="april-month">April</span>,</p>
     <p class="t2">and the clocks were striking thirteen.</p>
   </section>
 
@@ -948,7 +948,7 @@
         }
 
         setInterval(function () {
-          var t = currentTime();
+          var t      = currentTime();
           var stamps = aprilSec.querySelectorAll('.april-time');
           for (var i = 0; i < stamps.length; i++) stamps[i].textContent = t;
         }, 1000);
@@ -959,11 +959,61 @@
 
           if (!aprilClicked) {
             aprilClicked = true;
-            var now   = new Date();
-            var t1    = aprilSec.querySelector('.t1');
-            var t2    = aprilSec.querySelector('.t2');
-            if (t1) t1.textContent = t1.textContent.replace('April', MONTHS[now.getMonth()]);
-            if (t2) t2.textContent = t2.textContent.replace('thirteen', HOUR_WORDS[now.getHours()]);
+            var now     = new Date();
+            var h       = now.getHours();
+            var m       = now.getMonth(); /* 0-indexed: May=4, Sept=8 */
+            var d       = now.getDate();
+
+            /* month + clock word */
+            var monthEl = aprilSec.querySelector('.april-month');
+            var t2      = aprilSec.querySelector('.t2');
+            if (monthEl) monthEl.textContent = MONTHS[now.getMonth()];
+            if (t2)      t2.textContent = t2.textContent.replace('thirteen', HOUR_WORDS[h]);
+
+            /* day / night */
+            var isNight   = (h >= 20 || h <= 5);
+            var daytimeEl = aprilSec.querySelector('.april-daytime');
+            if (daytimeEl) daytimeEl.textContent = isNight ? 'night' : 'day';
+
+            /* bright → dark immediately if night */
+            var brightEl = aprilSec.querySelector('.april-bright');
+            if (brightEl && isNight) brightEl.textContent = 'dark';
+
+            /* cold / warm — date-based season first, then API */
+            var coldEl   = aprilSec.querySelector('.april-cold');
+            var isSummer = (m > 4 || (m === 4 && d >= 15))
+                        && (m < 8 || (m === 8 && d <= 15));
+            if (coldEl && isSummer) {
+              coldEl.textContent = 'warm';
+            } else if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(function (pos) {
+                var lat = pos.coords.latitude.toFixed(4);
+                var lon = pos.coords.longitude.toFixed(4);
+                fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat
+                    + '&longitude=' + lon + '&current=temperature_2m,weather_code')
+                  .then(function (r) { return r.json(); })
+                  .then(function (data) {
+                    var temp = data.current.temperature_2m;
+                    var code = data.current.weather_code;
+                    if (coldEl) coldEl.textContent = temp <= 12 ? 'cold' : temp <= 19 ? 'cool' : 'warm';
+                    if (brightEl && !isNight) {
+                      var w;
+                      if      (code <= 1)  w = 'bright';
+                      else if (code === 2) w = 'cloudy';
+                      else if (code === 3) w = 'overcast';
+                      else if (code <= 48) w = 'foggy';
+                      else if (code <= 57) w = 'grey';
+                      else if (code <= 67) w = 'rainy';
+                      else if (code <= 77) w = 'snowy';
+                      else if (code <= 82) w = 'rainy';
+                      else if (code <= 86) w = 'snowy';
+                      else                 w = 'stormy';
+                      brightEl.textContent = w;
+                    }
+                  })
+                  .catch(function () {});
+              }, function () {});
+            }
           }
 
           var r  = aprilSec.getBoundingClientRect();
@@ -1130,6 +1180,13 @@
             dtSection.scrollTop = dtScrollDir >= 0 ? 0 : maxScroll;
           }
         }, { threshold: 0.95 }).observe(dtSection);
+
+        var dtFontOpen = false;
+        dtSection.addEventListener('click', function () {
+          dtFontOpen = !dtFontOpen;
+          var f = dtFontOpen ? 'var(--font-open)' : 'var(--font)';
+          dtLines.forEach(function (line) { line.style.fontFamily = f; });
+        });
       }
 
       georgeSection = document.querySelector('.s-george');
@@ -1204,7 +1261,22 @@
 
           mkStamp(first,  cx,      cy);
           mkStamp(second, cx + ox, cy + oy);
+
+          /* "and" — random position near whichever word the user chose */
+          var nearX  = Math.random() < 0.5 ? cx : cx + ox;
+          var nearY  = Math.random() < 0.5 ? cy : cy + oy;
+          var aAngle = Math.random() * Math.PI * 2;
+          var aDist  = 60 + Math.random() * 60;
+          var andEl  = document.createElement('p');
+          andEl.className   = 'wb-stamp';
+          andEl.textContent = 'and';
+          andEl.style.left  = (nearX + Math.cos(aAngle) * aDist) + 'px';
+          andEl.style.top   = (nearY + Math.sin(aAngle) * aDist) + 'px';
+          darknessSec.appendChild(andEl);
+
           darknessSec.classList.toggle('inverted');
+          darknessSec.style.fontFamily = darknessSec.classList.contains('inverted')
+            ? 'var(--font-open)' : 'var(--font)';
         });
       }
 
