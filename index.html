@@ -142,28 +142,6 @@
     }
 
     /* ═══════════════════════════════════════════════
-       2. ARMY
-    ═══════════════════════════════════════════════ */
-    .s-army {
-      background-color: var(--light);
-    }
-
-    .s-army .army-wrap {
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-    }
-
-    .s-army .army-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center center;
-      /* replicate the dark mask from Figma */
-      mix-blend-mode: multiply;
-    }
-
-    /* ═══════════════════════════════════════════════
        3. WELCOME TO 1984
     ═══════════════════════════════════════════════ */
     .s-welcome {
@@ -313,23 +291,6 @@
     }
 
     /* ═══════════════════════════════════════════════
-       9. LONDON
-    ═══════════════════════════════════════════════ */
-    .s-london {
-      background-color: var(--light);
-    }
-
-    .s-london img {
-      position: absolute;
-      left: -0.73%;
-      top: 0;
-      width: 55%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center center;
-    }
-
-    /* ═══════════════════════════════════════════════
        10. DOUBLETHINK (masked text texture)
     ═══════════════════════════════════════════════ */
     .s-doublethink {
@@ -427,6 +388,7 @@
 
     .s-nodark p {
       font-size: var(--fs-h3);
+      font-family: var(--font-open);
       font-weight: 400;
       line-height: 1;
       color: var(--light);
@@ -439,7 +401,6 @@
     }
     .s-nodark.inverted p {
       color: var(--dark);
-      font-family: var(--font-open);
     }
 
     /* ═══════════════════════════════════════════════
@@ -587,16 +548,6 @@
   </section>
 
   <!-- ════════════════════════════════════════════
-       2. ARMY  ·  soldiers photo
-  ════════════════════════════════════════════ -->
-  <section class="s-army">
-    <div class="army-wrap">
-      <img src="images/army.svg"
-           alt="Army">
-    </div>
-  </section>
-
-  <!-- ════════════════════════════════════════════
        3. INTRO  ·  "Big Brother Is Watching You."
   ════════════════════════════════════════════ -->
   <section class="s-intro">
@@ -659,14 +610,6 @@
   <section class="s-april">
     <p class="t1">It was a bright cold day in April,</p>
     <p class="t2">and the clocks were striking thirteen.</p>
-  </section>
-
-  <!-- ════════════════════════════════════════════
-       9. LONDON  ·  Big Ben photo
-  ════════════════════════════════════════════ -->
-  <section class="s-london">
-    <img src="images/london.svg"
-         alt="London">
   </section>
 
   <!-- ════════════════════════════════════════════
@@ -848,7 +791,7 @@
     }
 
     function setupStamps() {
-      var STAMP_SELS = ['.s-welcome', '.s-intro', '.s-army', '.s-who', '.s-darkness-2'];
+      var STAMP_SELS = ['.s-welcome', '.s-intro', '.s-who', '.s-darkness-2'];
       var SKIP = 'a, button, input, select, textarea, [role="button"], label';
 
       STAMP_SELS.forEach(function (sel) {
@@ -880,6 +823,8 @@
           el.className        = 'text-stamp';
           el.style.color      = 'var(--light)';
           el.style.fontStyle  = 'normal';
+          el.style.textAlign  = 'center';
+          el.style.transform  = 'translate(-50%, -50%)';
           /* cycle: word → is → word → (repeat) */
           el.textContent = (warCount % 3 === 1)
             ? 'is'
@@ -1005,6 +950,27 @@
         dtLines.forEach(function (line) {
           line.style.transform = 'translateY(0px)';
         });
+
+        /* Track scroll direction so we can set inner scrollTop correctly
+           when the section snaps into view from either direction */
+        var dtScrollDir = 0;
+        window.addEventListener('wheel', function (e) {
+          dtScrollDir = e.deltaY > 0 ? 1 : -1;
+        }, { passive: true });
+        var dtTouchY = 0;
+        window.addEventListener('touchstart', function (e) {
+          dtTouchY = e.touches[0].clientY;
+        }, { passive: true });
+        window.addEventListener('touchmove', function (e) {
+          dtScrollDir = e.touches[0].clientY < dtTouchY ? 1 : -1;
+        }, { passive: true });
+
+        new IntersectionObserver(function (entries) {
+          if (entries[0].isIntersecting) {
+            var maxScroll = dtSection.scrollHeight - dtSection.clientHeight;
+            dtSection.scrollTop = dtScrollDir >= 0 ? 0 : maxScroll;
+          }
+        }, { threshold: 0.95 }).observe(dtSection);
       }
 
       georgeSection = document.querySelector('.s-george');
