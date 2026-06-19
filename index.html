@@ -605,7 +605,7 @@
          src="images/eye.svg"
          alt="">
     <h2>Welcome To The Year Of <span class="year-anim">1984</span><span class="year-cursor">|</span></h2>
-    <p class="scroll-hint">Click anywhere as you scroll.</p>
+    <p class="scroll-hint">Click anywhere as you scroll</p>
   </section>
 
   <!-- ════════════════════════════════════════════
@@ -644,15 +644,14 @@
        6. FOR EVER  Part 2  (scattered phrases)
   ════════════════════════════════════════════ -->
   <section class="s-forever-2">
-    <!-- dark-coloured (visible on light bg) -->
-    <p style="left: 5.76%;               top:  3.97%;">— for ever.</p>
-    <p style="left: calc(75% + 1.59vw);  top: 10.59%;">— for ever.</p>
-    <p style="left: calc(16.67% + 5.1vw);top: 26.27%;">— for ever.</p>
-    <p style="left: 5.76%;               top: 30.35%;">— for ever.</p>
-    <p style="left: calc(58.33% + 1.46vw);top: 44.20%;">— for ever.</p>
-    <p style="left: calc(16.67% + 1.46vw);top:  8.91%;">— for ever.</p>
-    <p style="left: calc(66.67% + 4.3vw); top: 68.74%;">— for ever.</p>
-    <p style="left: 5.76%;               top: 70.16%;">— for ever.</p>
+    <p>— for ever.</p>
+    <p>— for ever.</p>
+    <p>— for ever.</p>
+    <p>— for ever.</p>
+    <p>— for ever.</p>
+    <p>— for ever.</p>
+    <p>— for ever.</p>
+    <p>— for ever.</p>
   </section>
 
   <!-- ════════════════════════════════════════════
@@ -1028,6 +1027,17 @@
           aprilSec.appendChild(el);
         });
       }
+
+      /* randomise forever-2 positions on load */
+      (function () {
+        var sec = document.querySelector('.s-forever-2');
+        if (!sec) return;
+        var ps = sec.querySelectorAll('p');
+        ps.forEach(function (p) {
+          p.style.left = (5 + Math.random() * 80) + '%';
+          p.style.top  = (4 + Math.random() * 82) + '%';
+        });
+      }());
 
       ['.s-forever-1', '.s-forever-2'].forEach(function (sel) {
         var sec = document.querySelector(sel);
