@@ -95,7 +95,6 @@
        relative regardless of the section's actual computed height.
 
        .s-george: overflow-y:auto lets the inner 300vh drive scroll.   */
-    .s-forever-1,
     .s-george {
       overflow-y: auto;
     }
@@ -216,12 +215,13 @@
     ═══════════════════════════════════════════════ */
     .s-forever-1 {
       background-color: var(--light);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 11.40vh 0 0 4.23%;
     }
 
     .s-forever-1 .quote {
-      position: absolute;
-      left: 4.23%;
-      top: 11.40%;
       width: 68.32%;
       font-size: var(--fs-h3);
       font-weight: 400;
@@ -230,16 +230,14 @@
     }
 
     .s-forever-1 .forever-stack {
-      position: absolute;
-      left: clamp(16px, calc(16.67% + 3.1vw), calc(16.67% + 47px));
-      top: 46.13%;
+      margin-top: 2rem;
+      margin-left: clamp(0px, calc(12.44% + 3.1vw), calc(12.44% + 47px));
       display: flex;
       flex-direction: column;
       font-size: var(--fs-h3);
       font-weight: 400;
       line-height: 1;
       color: var(--dark);
-      font-style: italic;
     }
 
     /* ═══════════════════════════════════════════════
@@ -254,7 +252,6 @@
       font-size: var(--fs-h3);
       font-weight: 400;
       line-height: 1;
-      font-style: italic;
       white-space: nowrap;
       color: var(--dark);
     }
@@ -298,7 +295,7 @@
       left: 4.23%;
       top: 14.15%;
       width: 29.43%;
-      font-size: var(--fs-h4);
+      font-size: var(--fs-h3);
       font-weight: 400;
       line-height: 1;
       color: var(--dark);
@@ -309,7 +306,7 @@
       left: calc(66.67% - 0.33%);
       top: 60.49%;
       width: 29.43%;
-      font-size: var(--fs-h4);
+      font-size: var(--fs-h3);
       font-weight: 400;
       line-height: 1;
       color: var(--dark);
@@ -437,6 +434,14 @@
       max-width: 60.45%;
     }
 
+    .s-nodark.inverted {
+      background-color: var(--light);
+    }
+    .s-nodark.inverted p {
+      color: var(--dark);
+      font-family: var(--font-open);
+    }
+
     /* ═══════════════════════════════════════════════
        14. GEORGE ORWELL
     ═══════════════════════════════════════════════ */
@@ -499,7 +504,6 @@
       .s-war .w2 { left: auto; right: 4%; width: 55%; }
       .s-war .w3 { left: 4%;                           }
       .s-april .t2 { left: auto; right: 4%; width: 45%; }
-      .s-forever-2 p { font-size: clamp(16px, 4.5vw, 70px); }
       .s-nodark p { max-width: 90%; }
     }
 
@@ -515,12 +519,12 @@
     /* ─── Click-to-stamp text ──────────────────── */
     .text-stamp {
       position: absolute;
-      transform: translate(-50%, -50%);
+      transform: translate(-100%, -50%);
       pointer-events: none;
       font-size: var(--fs-h3);
       font-weight: 400;
       line-height: 1;
-      font-style: italic;
+      text-align: right;
       color: var(--dark);
       white-space: nowrap;
       z-index: 4;
@@ -621,10 +625,6 @@
       <p>— for ever.</p>
       <p>— for ever.</p>
       <p>— for ever.</p>
-      <p>— for ever.</p>
-      <p>— for ever.</p>
-      <p>— for ever.</p>
-      <p>— for ever.</p>
     </div>
   </section>
 
@@ -687,7 +687,7 @@
   </section>
 
   <!-- ════════════════════════════════════════════
-       11. DARKNESS  ·  Doublethink quote + eyes
+       11. DOUBLETHINK
   ════════════════════════════════════════════ -->
   <section class="s-darkness">
     <p class="dt-quote">
@@ -695,37 +695,10 @@
       contradictory beliefs in one&#8217;s mind simultaneously, and accepting
       both of them.
     </p>
-
-    <!-- eye icons scattered (positions as % of section height) -->
-    <img class="eye-icon"
-         src="images/eye.svg"
-         alt=""
-         style="left: calc(54.17% - 1.32vw); top: 22%;">
-    <img class="eye-icon"
-         src="images/eye.svg"
-         alt=""
-         style="left: calc(54.17% - 1.32vw); top: 45%;">
-    <img class="eye-icon"
-         src="images/eye.svg"
-         alt=""
-         style="left: calc(16.67% + 2.84vw); top: 60%;">
-    <img class="eye-icon"
-         src="images/eye.svg"
-         alt=""
-         style="left: calc(79.17% - 1.85vw); top: 78%;">
-    <img class="eye-icon"
-         src="images/eye.svg"
-         alt=""
-         style="left: calc(37.5% - 1.92vw); top: 89%;">
-
-    <!-- figure/silhouette -->
-    <img class="figure-img"
-         src="images/figure.svg"
-         alt="">
   </section>
 
   <!-- ════════════════════════════════════════════
-       12. DARKNESS  ·  eyes
+       12. EYES
   ════════════════════════════════════════════ -->
   <section class="s-darkness-2">
     <img class="eye-icon"
@@ -751,7 +724,7 @@
   </section>
 
   <!-- ════════════════════════════════════════════
-       13. "…no darkness."
+       13. "DARKNESS TEXT"
   ════════════════════════════════════════════ -->
   <section class="s-nodark">
     <p>We shall meet in the place where there is no darkness.</p>
@@ -918,6 +891,34 @@
         });
       }
 
+      var aprilSec = document.querySelector('.s-april');
+      if (aprilSec) {
+        function currentTime() {
+          var now = new Date();
+          return String(now.getHours()).padStart(2, '0') + ':'
+               + String(now.getMinutes()).padStart(2, '0') + ':'
+               + String(now.getSeconds()).padStart(2, '0');
+        }
+
+        setInterval(function () {
+          var t = currentTime();
+          var stamps = aprilSec.querySelectorAll('.april-time');
+          for (var i = 0; i < stamps.length; i++) stamps[i].textContent = t;
+        }, 1000);
+
+        aprilSec.addEventListener('click', function (e) {
+          if (e.target.closest(SKIP)) return;
+          var r  = aprilSec.getBoundingClientRect();
+          var el = document.createElement('p');
+          el.className = 'text-stamp april-time';
+          el.style.fontFamily = 'var(--font-open)';
+          el.textContent = currentTime();
+          el.style.left = (e.clientX - r.left) + 'px';
+          el.style.top  = (e.clientY - r.top)  + 'px';
+          aprilSec.appendChild(el);
+        });
+      }
+
       ['.s-forever-1', '.s-forever-2'].forEach(function (sel) {
         var sec = document.querySelector(sel);
         if (!sec) return;
@@ -1016,6 +1017,13 @@
         georgeRows.forEach(function (row, i) {
           var offset = (i - georgeCenter) * georgeSpread;
           row.style.transform = 'translateY(' + offset.toFixed(1) + 'px)';
+        });
+      }
+
+      var nodarkSec = document.querySelector('.s-nodark');
+      if (nodarkSec) {
+        nodarkSec.addEventListener('click', function () {
+          nodarkSec.classList.toggle('inverted');
         });
       }
 
