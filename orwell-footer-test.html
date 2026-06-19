@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Orwell + Footer Layout Test</title>
+  <style>
+    @font-face {
+      font-family: 'Terminal Grotesque Open';
+      src: url('fonts/terminal-grotesque_open.otf') format('opentype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Terminal Grotesque';
+      src: url('fonts/terminal-grotesque-webfont.woff2') format('woff2'),
+           url('fonts/terminal-grotesque-webfont.woff')  format('woff'),
+           url('fonts/terminal-grotesque-webfont.ttf')   format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #312e2e;
+      height: 300vh; /* 200vh of scroll drives the full converge */
+    }
+
+    /* Fixed stage — always fills the viewport */
+    .scene {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    /* George Orwell lines — positioned from top:50% left:50%
+       so translate(-50%,-50%) centres them exactly at the
+       scene midpoint before the JS offset is applied. */
+    .go-line {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      color: #e9e9e9;
+      font-family: 'Terminal Grotesque Open', 'Terminal Grotesque', sans-serif;
+      font-weight: 400;
+      line-height: 0.888;
+      white-space: nowrap;
+      user-select: none;
+      will-change: transform;
+    }
+
+    /* Footer credit — anchored to the bottom of the scene */
+    .credit {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #e9e9e9;
+      font-family: 'Terminal Grotesque Open', 'Terminal Grotesque', sans-serif;
+      font-size: clamp(10px, 0.93vw, 14px);
+      font-weight: 400;
+      letter-spacing: 3.08px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .credit a {
+      color: #e9e9e9;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="scene">
+    <span class="go-line">George Orwell</span>
+    <span class="go-line">George Orwell</span>
+    <span class="go-line">George Orwell</span>
+    <span class="go-line">George Orwell</span>
+    <span class="go-line">George Orwell</span>
+    <span class="go-line">George Orwell</span>
+    <span class="go-line">George Orwell</span>
+    <span class="go-line">George Orwell</span>
+    <span class="go-line">George Orwell</span>
+    <p class="credit">Designed &amp; Developed by <a href="#">Lina Moreno</a> in 1984</p>
+  </div>
+
+  <script>
+    /* ══ Tune these ════════════════════════════════════════════════
+
+       FONT_VW        — font size of each "George Orwell" line, in vw.
+                        Controls how large the converged stack appears.
+
+       STACK_TOP_VH   — vertical position of the converged stack's
+                        centre, measured in vh from the TOP of the
+                        section. 50 = dead centre. Lower values move
+                        it higher (e.g. 35 = upper-middle).
+
+       LINE_GAP_PX    — space between adjacent lines in the CONVERGED
+                        stack, in px. 0 = all lines on top of each other
+                        (one solid block). Increase for a scanline look.
+
+       FOOTER_BOTTOM  — how far the credit sits from the BOTTOM edge,
+                        as a CSS value (rem, px, vh, etc.).
+
+    ════════════════════════════════════════════════════════════════ */
+    var FONT_VW       = 5;       /* vw  */
+    var STACK_TOP_VH  = 35;      /* vh from top  */
+    var LINE_GAP_PX   = 0;       /* px gap when converged  */
+    var FOOTER_BOTTOM = '4rem';  /* CSS length  */
+    /* ══════════════════════════════════════════════════════════════ */
+
+    var lines  = [].slice.call(document.querySelectorAll('.go-line'));
+    var credit = document.querySelector('.credit');
+    var COUNT  = lines.length;            /* 9 */
+    var CENTER = Math.floor(COUNT / 2);   /* 4 */
+
+    /* Apply font size so offsetHeight is correct when we measure */
+    lines.forEach(function (l) { l.style.fontSize = FONT_VW + 'vw'; });
+
+    /* Credit position */
+    credit.style.bottom = FOOTER_BOTTOM;
+
+    /* Spread pitch — one visual line-height plus 10% breathing room.
+       Derived from the rendered font size so it scales with FONT_VW. */
+    var pitch = Math.round(lines[0].offsetHeight * 1.1);
+
+    /* Y offset from scene centre to the stack's converge point.
+       Negative = above centre. Recomputed if window resizes. */
+    var stackY = (STACK_TOP_VH - 50) / 100 * window.innerHeight;
+
+    /* Initialise lines to the fully-spread starting position */
+    lines.forEach(function (l, i) {
+      var step = i - CENTER;
+      var y    = stackY + step * (pitch + LINE_GAP_PX);
+      l.style.transform = 'translate(-50%, -50%) translateY(' + y.toFixed(1) + 'px)';
+    });
+
+    /* ── Animation loop — direct 1:1 scroll → position ── */
+    function update() {
+      var scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      var progress   = scrollable > 0
+        ? Math.min(1, Math.max(0, window.scrollY / scrollable))
+        : 0;
+      var inv = 1 - progress; /* 1 = spread, 0 = converged */
+
+      lines.forEach(function (l, i) {
+        var step = i - CENTER;
+        /* pitch * inv shrinks to zero as convergence completes;
+           LINE_GAP_PX persists, setting the final stack spacing. */
+        var y = stackY + step * (pitch * inv + LINE_GAP_PX);
+        l.style.transform = 'translate(-50%, -50%) translateY(' + y.toFixed(1) + 'px)';
+      });
+
+      requestAnimationFrame(update);
+    }
+
+    update();
+  </script>
+
+</body>
+</html>

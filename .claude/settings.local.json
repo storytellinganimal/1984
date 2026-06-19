@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//private/tmp/**)",
+      "Bash(unzip -j terminal-grotesque.zip Terminal-Grotesque-master/webspecimen/font/terminal-grotesque-webfont.woff2 Terminal-Grotesque-master/webspecimen/font/terminal-grotesque-webfont.woff Terminal-Grotesque-master/webspecimen/font/terminal-grotesque-webfont.ttf Terminal-Grotesque-master/terminal-grotesque_open.otf Terminal-Grotesque-master/LICENSE.md -d /Users/morenol/big-brother-site/fonts/)",
+      "Bash(python3 -c \"import fontTools\")",
+      "Bash(npx --yes ttf2woff2 --version)",
+      "Bash(file /Users/morenol/big-brother-site/images/*.png)",
+      "mcp__claude_ai_Figma__get_design_context",
+      "Bash(curl -s -o /tmp/eye-asset \"https://www.figma.com/api/mcp/asset/f859e0ab-565f-47cc-9367-51746d5bcc78\")",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /tmp/eye-screenshot.png \"https://www.figma.com/api/mcp/asset/a818cb90-6d42-4550-9c82-21653eab6ddc\")",
+      "Bash(md5 *)",
+      "Bash(curl -s -o /Users/morenol/big-brother-site/images/eye.svg https://www.figma.com/api/mcp/asset/f859e0ab-565f-47cc-9367-51746d5bcc78)",
+      "Bash(ngrok version *)",
+      "mcp__claude_ai_Figma__get_metadata"
+    ]
+  }
+}

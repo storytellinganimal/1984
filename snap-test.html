@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Snap Test</title>
+<style>
+  /*
+    Definitive snap test — no JS, no images, no fonts.
+    scroll-snap-type is on HTML (the true viewport scroller).
+
+    WHY html not body:
+    CSS Overflow spec §3: if html has overflow:visible (default),
+    body's overflow propagates to the viewport. body's own overflow
+    then reverts to visible. Putting scroll-snap-type on body
+    therefore targets a non-scrolling element — snap never fires.
+    Putting it on html avoids the propagation trap entirely.
+  */
+  html {
+    height: 100vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+  }
+
+  section {
+    height: 100vh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: bold 6rem/1 sans-serif;
+  }
+
+  section:nth-child(odd)  { background: #312e2e; color: #e9e9e9; }
+  section:nth-child(even) { background: #e9e9e9; color: #312e2e; }
+</style>
+</head>
+<body>
+  <section>1</section>
+  <section>2</section>
+  <section>3</section>
+  <section>4</section>
+  <section>5</section>
+</body>
+</html>

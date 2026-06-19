@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Big Brother</title>
+  <style>
+    /* ─── Terminal Grotesque by Raphaël Bastide · Velvetyne Type Foundry ──────
+       SIL Open Font License 1.1 — see fonts/LICENSE.md
+       Source: https://velvetyne.fr/fonts/terminal-grotesque/
+    ──────────────────────────────────────────────────────────────────────── */
+    @font-face {
+      font-family: 'Terminal Grotesque';
+      src: url('fonts/terminal-grotesque-webfont.woff2') format('woff2'),
+           url('fonts/terminal-grotesque-webfont.woff')  format('woff'),
+           url('fonts/terminal-grotesque-webfont.ttf')   format('truetype');
+      font-weight: 400;
+      font-style:  normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Terminal Grotesque Open';
+      src: url('fonts/terminal-grotesque_open.otf') format('opentype');
+      font-weight: 400;
+      font-style:  normal;
+      font-display: swap;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --dark:    #312e2e;
+      --light:   #e9e9e9;
+      --page-bg: #312e2e;
+
+      /* Terminal Grotesque (regular) for body / H2–H4
+         Terminal Grotesque Open for H1 display headings
+         Fallbacks: system grotesque stack */
+      --font:      'Terminal Grotesque', 'Arial', sans-serif;
+      --font-open: 'Terminal Grotesque Open', 'Terminal Grotesque', 'Arial', sans-serif;
+
+      /* Responsive type scale: designed at 1512 px wide */
+      --fs-h1:    clamp(44px,  11.57vw, 175px);
+      --fs-h2:    clamp(32px,   8.60vw, 130px);
+      --fs-h3:    clamp(20px,   6.88vw, 104px);
+      --fs-h4:    clamp(16px,   5.16vw,  78px);
+      --fs-small: clamp(10px,   0.93vw,  14px);
+
+      --eye-w: clamp(70px, 14.55vw, 220px);
+      --section-h: 100vh;
+    }
+
+    html {
+      /* html is the true viewport scroller — single scroll context.
+         CSS Overflow spec: if html has overflow:visible (default),
+         body's overflow propagates to the viewport and body's own
+         overflow reverts to visible, so scroll-snap-type on body
+         would target a non-scrolling element and never fire. */
+      height: 100vh;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--page-bg);
+      font-family: var(--font);
+      color: var(--light);
+    }
+
+    /* ─── shared ─────────────────────────────────── */
+    section {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+    }
+
+    /* ─── Tall free-scroll sections ─────────────────────────────────
+       These sections exceed 100vh and opt out of snapping. The
+       surrounding 100vh sections still snap via scroll-snap-stop:always.
+
+       .s-forever-1: all children are position:absolute so height can't
+       be 'auto' — it's calculated from the deepest content (stack top
+       offset + 8 lines × clamped font-size + breathing room). Top
+       values on children switch from % to vh so they stay viewport-
+       relative regardless of the section's actual computed height.
+
+       .s-george: overflow-y:auto lets the inner 300vh drive scroll.   */
+    .s-forever-1,
+    .s-george {
+      overflow-y: auto;
+    }
+
+    /* ═══════════════════════════════════════════════
+       1. INTRO
+    ═══════════════════════════════════════════════ */
+    .s-intro {
+      background-color: var(--dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .s-intro .bg-army {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      opacity: 0.35;
+    }
+
+    .s-intro .eye-top {
+      position: absolute;
+      top: clamp(16px, 2.3vw, 36px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: var(--eye-w);
+      height: auto;
+      z-index: 2;
+    }
+
+    .s-intro h1 {
+      position: relative;
+      z-index: 2;
+      font-family: var(--font-open);
+      font-size: var(--fs-h1);
+      font-weight: 400;
+      line-height: 0.888;
+      color: var(--light);
+      text-align: center;
+      padding: 0 12%;
+    }
+
+    /* ═══════════════════════════════════════════════
+       2. ARMY
+    ═══════════════════════════════════════════════ */
+    .s-army {
+      background-color: var(--light);
+    }
+
+    .s-army .army-wrap {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .s-army .army-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      /* replicate the dark mask from Figma */
+      mix-blend-mode: multiply;
+    }
+
+    /* ═══════════════════════════════════════════════
+       3. WELCOME TO 1984
+    ═══════════════════════════════════════════════ */
+    .s-welcome {
+      background-color: var(--light);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(16px, 3vw, 48px);
+      padding: 0 15%;
+    }
+
+    .s-welcome .eye,
+    .s-welcome .eye-stamp {
+      width: var(--eye-w);
+      height: auto;
+      --fill-0: #312e2e;
+    }
+
+    .s-welcome h2 {
+      font-size: var(--fs-h2);
+      font-weight: 400;
+      line-height: 0.908;
+      color: var(--dark);
+      text-align: center;
+    }
+
+    /* ═══════════════════════════════════════════════
+       4. WAR IS PEACE
+    ═══════════════════════════════════════════════ */
+    .s-war {
+      background-color: var(--dark);
+    }
+
+    .s-war p {
+      position: absolute;
+      font-size: var(--fs-h3);
+      font-weight: 400;
+      line-height: 1;
+      color: var(--light);
+    }
+
+    .s-war .w1 { left: 4.23%;          top: 10.59%; width: 37.17%; }
+    .s-war .w2 { left: 62.37%;         top: 30.75%; width: 29.43%; }
+    .s-war .w3 { left: 19.97%;         top: 66.60%; width: 37.17%; }
+
+    /* ═══════════════════════════════════════════════
+       5. FOR EVER — Part 1
+    ═══════════════════════════════════════════════ */
+    .s-forever-1 {
+      background-color: var(--light);
+    }
+
+    .s-forever-1 .quote {
+      position: absolute;
+      left: 4.23%;
+      top: 11.40%;
+      width: 68.32%;
+      font-size: var(--fs-h3);
+      font-weight: 400;
+      line-height: 1;
+      color: var(--dark);
+    }
+
+    .s-forever-1 .forever-stack {
+      position: absolute;
+      left: clamp(16px, calc(16.67% + 3.1vw), calc(16.67% + 47px));
+      top: 46.13%;
+      display: flex;
+      flex-direction: column;
+      font-size: var(--fs-h3);
+      font-weight: 400;
+      line-height: 1;
+      color: var(--dark);
+      font-style: italic;
+    }
+
+    /* ═══════════════════════════════════════════════
+       6. FOR EVER — Part 2
+    ═══════════════════════════════════════════════ */
+    .s-forever-2 {
+      background-color: var(--light);
+    }
+
+    .s-forever-2 p {
+      position: absolute;
+      font-size: var(--fs-h3);
+      font-weight: 400;
+      line-height: 1;
+      font-style: italic;
+      white-space: nowrap;
+      color: var(--dark);
+    }
+
+    /* ═══════════════════════════════════════════════
+       7. WHO CONTROLS THE FUTURE
+    ═══════════════════════════════════════════════ */
+    .s-who {
+      background-color: var(--dark);
+    }
+
+    .s-who .eye-center {
+      position: absolute;
+      top: 17.04%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: var(--eye-w);
+      height: auto;
+    }
+
+    .s-who .quote {
+      position: absolute;
+      left: 4.23%;
+      top: 47.25%;
+      width: 76.06%;
+      font-size: var(--fs-h3);
+      font-weight: 400;
+      line-height: 1;
+      color: var(--light);
+    }
+
+    /* ═══════════════════════════════════════════════
+       8. APRIL
+    ═══════════════════════════════════════════════ */
+    .s-april {
+      background-color: var(--light);
+    }
+
+    .s-april .t1 {
+      position: absolute;
+      left: 4.23%;
+      top: 14.15%;
+      width: 29.43%;
+      font-size: var(--fs-h4);
+      font-weight: 400;
+      line-height: 1;
+      color: var(--dark);
+    }
+
+    .s-april .t2 {
+      position: absolute;
+      left: calc(66.67% - 0.33%);
+      top: 60.49%;
+      width: 29.43%;
+      font-size: var(--fs-h4);
+      font-weight: 400;
+      line-height: 1;
+      color: var(--dark);
+    }
+
+    /* ═══════════════════════════════════════════════
+       9. LONDON
+    ═══════════════════════════════════════════════ */
+    .s-london {
+      background-color: var(--light);
+    }
+
+    .s-london img {
+      position: absolute;
+      left: -0.73%;
+      top: 0;
+      width: 55%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+    }
+
+    /* ═══════════════════════════════════════════════
+       10. DOUBLETHINK (masked text texture)
+    ═══════════════════════════════════════════════ */
+    .s-doublethink {
+      background-color: var(--dark);
+      overflow-y: auto; /* inner scroll drives fan; outer snap still works */
+    }
+
+    /* 300vh inner track gives 200vh of scroll travel for the fan animation */
+    .dt-inner {
+      height: 300vh;
+      position: relative;
+    }
+
+    /* Sticky scene stays fixed in the viewport as dt-inner scrolls */
+    .dt-scene {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* All lines share the same absolute position — stacked at start */
+    .dt-line {
+      position: absolute;
+      color: var(--light);
+      font-family: var(--font);
+      font-size: 21.96vw;   /* 332px at 1512px Figma design width */
+      font-weight: 400;
+      line-height: 1;
+      white-space: nowrap;
+      user-select: none;
+      will-change: transform;
+    }
+
+    /* ═══════════════════════════════════════════════
+       11. DARKNESS — Quote
+    ═══════════════════════════════════════════════ */
+    .s-darkness {
+      background-color: var(--dark);
+    }
+
+    .s-darkness .dt-quote {
+      position: absolute;
+      left: 4.23%;
+      top: 9.57%;
+      width: 75.46%;
+      font-size: var(--fs-h3);
+      font-weight: 400;
+      line-height: 1;
+      color: var(--light);
+    }
+
+    .s-darkness .dt-quote .word {
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .s-darkness .eye-icon,
+    .s-darkness-2 .eye-icon,
+    .s-darkness-3 .eye-icon {
+      position: absolute;
+      width: var(--eye-w);
+      height: auto;
+      transform: translate(-50%, -50%);
+    }
+
+    .s-darkness .figure-img {
+      position: absolute;
+      right: 9.26%;
+      bottom: 26.79%;
+      width: 14.55%;
+      height: auto;
+    }
+
+    /* ═══════════════════════════════════════════════
+       12. DARKNESS — Eyes
+    ═══════════════════════════════════════════════ */
+    .s-darkness-2 {
+      background-color: var(--dark);
+    }
+
+    /* ═══════════════════════════════════════════════
+       13. NO DARKNESS
+    ═══════════════════════════════════════════════ */
+    .s-nodark {
+      background-color: var(--dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10%;
+    }
+
+    .s-nodark p {
+      font-size: var(--fs-h3);
+      font-weight: 400;
+      line-height: 1;
+      color: var(--light);
+      text-align: center;
+      max-width: 60.45%;
+    }
+
+    /* ═══════════════════════════════════════════════
+       14. GEORGE ORWELL
+    ═══════════════════════════════════════════════ */
+    .s-george {
+      background-color: var(--dark);
+    }
+
+    .george-inner {
+      height: 300vh;
+      position: relative;
+    }
+
+    .george-scene {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .george-row {
+      position: absolute;
+      font-family: var(--font-open);
+      font-size: var(--fs-h1);
+      font-weight: 400;
+      line-height: 0.888;
+      color: var(--light);
+      text-align: center;
+      white-space: nowrap;
+      will-change: transform;
+    }
+
+    /* ═══════════════════════════════════════════════
+       GEORGE ORWELL CREDIT  (inside .george-scene)
+    ═══════════════════════════════════════════════ */
+    .george-credit {
+      position: absolute;
+      bottom: 4rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: var(--fs-small);
+      letter-spacing: 3.08px;
+      text-transform: uppercase;
+      color: #ffffff;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .george-credit a {
+      color: #ffffff;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      pointer-events: auto;
+    }
+
+    /* ─── Responsive tweaks ───────────────────────── */
+    @media (max-width: 768px) {
+      .s-war .w2 { left: auto; right: 4%; width: 55%; }
+      .s-war .w3 { left: 4%;                           }
+      .s-april .t2 { left: auto; right: 4%; width: 45%; }
+      .s-forever-2 p { font-size: clamp(16px, 4.5vw, 70px); }
+      .s-nodark p { max-width: 90%; }
+    }
+
+    /* ─── Inline eye SVG sizing ─────────────────── */
+    .eye-top, .eye, .eye-center, .eye-icon { display: block; }
+    .eye-top svg, .eye svg, .eye-center svg, .eye-icon svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 220 / 113.801;
+    }
+
+    /* ─── Click-to-stamp text ──────────────────── */
+    .text-stamp {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      font-size: var(--fs-h3);
+      font-weight: 400;
+      line-height: 1;
+      font-style: italic;
+      color: var(--dark);
+      white-space: nowrap;
+      z-index: 4;
+    }
+
+    /* ─── Click-to-stamp eyes ───────────────────── */
+    .eye-stamp {
+      position: absolute;
+      width: var(--eye-w);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 4;
+    }
+    .eye-stamp svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    /* ─── iOS orientation permission prompt ─────── */
+    #orient-prompt {
+      position: fixed;
+      bottom: clamp(1.25rem, 5vw, 2rem);
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 0.65em 1.5em;
+      background: var(--dark, #312e2e);
+      color: var(--light, #e9e9e9);
+      border: 1px solid rgba(233,233,233,0.22);
+      font-family: var(--font, 'Terminal Grotesque', sans-serif);
+      font-size: clamp(10px, 2.8vw, 12px);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      cursor: pointer;
+      z-index: 10000;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-appearance: none;
+      appearance: none;
+      opacity: 1;
+      transition: opacity 0.4s ease;
+    }
+    #orient-prompt.bb-hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════
+       1. INTRO  ·  "Big Brother Is Watching You."
+  ════════════════════════════════════════════ -->
+  <section class="s-welcome">
+    <img class="eye"
+         src="images/eye.svg"
+         alt="">
+    <h2>Welcome To The Year Of 1984</h2>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       2. ARMY  ·  soldiers photo
+  ════════════════════════════════════════════ -->
+  <section class="s-army">
+    <div class="army-wrap">
+      <img src="images/army.svg"
+           alt="Army">
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       3. INTRO  ·  "Big Brother Is Watching You."
+  ════════════════════════════════════════════ -->
+  <section class="s-intro">
+    <img class="eye-top"
+         src="images/eye.svg"
+         alt="">
+    <h1>Big Brother&nbsp;<br>Is Watching You.</h1>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       4. WAR IS PEACE
+  ════════════════════════════════════════════ -->
+  <section class="s-war">
+    <p class="w1">War is peace.</p>
+    <p class="w2">Freedom is slavery.</p>
+    <p class="w3">Ignorance is strength.</p>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       5. FOR EVER  Part 1
+  ════════════════════════════════════════════ -->
+  <section class="s-forever-1">
+    <p class="quote">If you want a picture of the future, imagine a boot stamping on a human face</p>
+    <div class="forever-stack">
+      <p>— for ever.</p>
+      <p>— for ever.</p>
+      <p>— for ever.</p>
+      <p>— for ever.</p>
+      <p>— for ever.</p>
+      <p>— for ever.</p>
+      <p>— for ever.</p>
+      <p>— for ever.</p>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       6. FOR EVER  Part 2  (scattered phrases)
+  ════════════════════════════════════════════ -->
+  <section class="s-forever-2">
+    <!-- dark-coloured (visible on light bg) -->
+    <p style="left: 5.76%;               top:  3.97%;">— for ever.</p>
+    <p style="left: calc(75% + 1.59vw);  top: 10.59%;">— for ever.</p>
+    <p style="left: calc(16.67% + 5.1vw);top: 26.27%;">— for ever.</p>
+    <p style="left: 5.76%;               top: 30.35%;">— for ever.</p>
+    <p style="left: calc(58.33% + 1.46vw);top: 44.20%;">— for ever.</p>
+    <p style="left: calc(16.67% + 1.46vw);top:  8.91%;">— for ever.</p>
+    <p style="left: calc(66.67% + 4.3vw); top: 68.74%;">— for ever.</p>
+    <p style="left: 5.76%;               top: 70.16%;">— for ever.</p>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       7. WHO CONTROLS THE FUTURE
+  ════════════════════════════════════════════ -->
+  <section class="s-who">
+    <img class="eye-center"
+         src="images/eye.svg"
+         alt="">
+    <p class="quote">Who controls the past controls the future. Who controls the present controls the past.</p>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       8. APRIL  ·  opening line
+  ════════════════════════════════════════════ -->
+  <section class="s-april">
+    <p class="t1">It was a bright cold day in April,</p>
+    <p class="t2">and the clocks were striking thirteen.</p>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       9. LONDON  ·  Big Ben photo
+  ════════════════════════════════════════════ -->
+  <section class="s-london">
+    <img src="images/london.svg"
+         alt="London">
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       10. DOUBLETHINK  ·  text-texture mask
+  ════════════════════════════════════════════ -->
+  <section class="s-doublethink">
+    <div class="dt-inner">
+      <div class="dt-scene">
+        <span class="dt-line">Doublethink</span>
+        <span class="dt-line">Doublethink</span>
+        <span class="dt-line">Doublethink</span>
+        <span class="dt-line">Doublethink</span>
+        <span class="dt-line">Doublethink</span>
+        <span class="dt-line">Doublethink</span>
+        <span class="dt-line">Doublethink</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       11. DARKNESS  ·  Doublethink quote + eyes
+  ════════════════════════════════════════════ -->
+  <section class="s-darkness">
+    <p class="dt-quote">
+      <span class="word">Doublethink</span> means the power of holding two
+      contradictory beliefs in one&#8217;s mind simultaneously, and accepting
+      both of them.
+    </p>
+
+    <!-- eye icons scattered (positions as % of section height) -->
+    <img class="eye-icon"
+         src="images/eye.svg"
+         alt=""
+         style="left: calc(54.17% - 1.32vw); top: 22%;">
+    <img class="eye-icon"
+         src="images/eye.svg"
+         alt=""
+         style="left: calc(54.17% - 1.32vw); top: 45%;">
+    <img class="eye-icon"
+         src="images/eye.svg"
+         alt=""
+         style="left: calc(16.67% + 2.84vw); top: 60%;">
+    <img class="eye-icon"
+         src="images/eye.svg"
+         alt=""
+         style="left: calc(79.17% - 1.85vw); top: 78%;">
+    <img class="eye-icon"
+         src="images/eye.svg"
+         alt=""
+         style="left: calc(37.5% - 1.92vw); top: 89%;">
+
+    <!-- figure/silhouette -->
+    <img class="figure-img"
+         src="images/figure.svg"
+         alt="">
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       12. DARKNESS  ·  eyes
+  ════════════════════════════════════════════ -->
+  <section class="s-darkness-2">
+    <img class="eye-icon"
+         src="images/eye.svg"
+         alt=""
+         style="left: calc(79.17% - 0.73vw); top: 50%;">
+    <img class="eye-icon"
+         src="images/eye.svg"
+         alt=""
+         style="left: calc(95.83% - 0.66vw); top: 50%;">
+    <img class="eye-icon"
+         src="images/eye.svg"
+         alt=""
+         style="left: calc(4.17% + 0.07vw); top: 50%;">
+    <img class="eye-icon"
+         src="images/eye.svg"
+         alt=""
+         style="left: calc(4.17% + 1.46vw); top: 50%;">
+    <img class="eye-icon"
+         src="images/eye.svg"
+         alt=""
+         style="left: calc(95.83% - 1.79vw); top: 50%;">
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       13. "…no darkness."
+  ════════════════════════════════════════════ -->
+  <section class="s-nodark">
+    <p>We shall meet in the place where there is no darkness.</p>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       14. GEORGE ORWELL  (repeated, scanline)
+  ════════════════════════════════════════════ -->
+  <section class="s-george">
+    <div class="george-inner">
+      <div class="george-scene">
+        <span class="george-row">George Orwell</span>
+        <span class="george-row">George Orwell</span>
+        <span class="george-row">George Orwell</span>
+        <span class="george-row">George Orwell</span>
+        <span class="george-row">George Orwell</span>
+        <span class="george-row">George Orwell</span>
+        <span class="george-row">George Orwell</span>
+        <span class="george-row">George Orwell</span>
+        <span class="george-row">George Orwell</span>
+        <p class="george-credit">Designed &amp; Developed by <a href="#">Lina Moreno</a> in 1984</p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+  (function () {
+    var VB_W  = 220;
+    var VB_H  = 113.801;
+    var MAX_R = 17;    /* max pupil travel in SVG viewBox units */
+    var LERP  = 0.42;  /* fraction of gap closed per frame at 60fps */
+
+    var mx = window.innerWidth  / 2;
+    var my = window.innerHeight / 2;
+    var states = [];
+
+    /* ── Doublethink fan effect ───────────────────────────────────────────
+       Reads dtSection.scrollTop (inner scroll), NOT window.scrollY.
+       The outer html snap scroll is unaffected.                           */
+    var dtSection = null;
+    var dtLines   = [];
+    var dtCenter  = 3;     /* index of middle line (0-based, 7 lines → 3) */
+    var dtSpread  = 0;     /* px between adjacent line centres at full fan */
+
+    var georgeSection = null;
+    var georgeRows    = [];
+    var georgeCenter  = 4; /* middle of 9 lines (0-based) */
+    var georgeSpread  = 0;
+
+/* Inline SVG: static eye body + movable pupil in its own <g class="eye-p"> */
+    var EYE_HTML =
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 113.801" fill="none" aria-hidden="true">'
+      + '<path fill="var(--fill-0,#e9e9e9)" d="M180.026 20.0303V26.7407H193.344V33.4242H199.999V40.1077H206.682V46.818H213.338V53.5284H220V60.2119H213.391V66.9223H206.742V73.6327H200.06V80.3162H193.404V86.9996H180.052V93.71H166.734V100.42H153.383V107.104H133.362V113.801H80.0292V107.164H66.6776V100.481H46.6569V93.7705H40.0012V87.0602H26.6497V80.3767H19.9672V73.6663H13.3115V66.9828H6.65573V60.2724H0V53.5889H6.60895V46.8785H13.2647V40.1682H19.9471V33.4847H26.6296V26.7743H33.2853V20.0908H46.6035V13.3804H59.955V6.69694H79.9757V0H139.978V6.63642H159.998V13.3199H173.35V20.0303H180.032H180.026ZM66.6576 20.0706H53.2659V26.7877H39.9411V33.4712H33.2853V40.1816H26.6029V46.8651H19.9204V53.5755H13.3449V60.2859H19.9939V66.9694H26.6497V73.6528H33.3321V80.3632H46.6569V87.0736H60.0085V93.6764H66.584V80.3027H59.955V60.2254H53.3595V46.8113H60.0018V26.7339H66.6375C66.6375 24.4411 66.6375 22.2424 66.6375 20.0437H73.2665V13.414H66.6642V20.0639L66.6576 20.0706ZM153.342 20.0706V13.414H146.74V20.0505H153.362V33.4981H159.971V80.3632H153.409V93.6966H160.032V87.0064H173.383V80.3296H186.735V73.6192H193.384V66.9088H200.066V60.2254H206.662V53.5419H200.006V46.8315H193.357V40.1211H186.675V33.4376H173.323V26.7272H166.674V20.0706C162.17 20.0706 157.753 20.0706 153.342 20.0706ZM153.296 73.6528V40.1144H146.653V26.7339H139.971V20.0236H126.646V13.4006H86.6448V20.0908H79.9623V26.7743H73.2799V40.1816H66.6976V73.6865H73.34V87.0669H80.0225V93.7773H93.3473V100.4H126.679V93.71H140.031V87.0265H146.713V73.6461H153.296V73.6528Z"/>'
+      + '<g class="eye-p"><path fill="var(--fill-0,#e9e9e9)" d="M93.3875 46.8247H99.9764V40.2017H119.99V46.8179H126.613V66.9222H120.024V73.572H100.01V66.9558H93.3875V46.8179V46.8247ZM113.268 60.2252V53.6023H106.732V60.2252H113.268Z"/></g>'
+      + '</svg>';
+
+    /* ── Touch/mobile detection: coarse pointer + no hover = phone/tablet ── */
+    var TOUCH = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+    /* ── Orientation state (mobile only) ─────────────────────────────────── */
+    var USE_ORIENT = false;
+    var orientX    = 0;   /* target in SVG viewBox units */
+    var orientY    = 0;
+    var TILT_DEG   = 22;  /* degrees of physical tilt → full MAX_R travel    */
+
+    function startOrientTracking() {
+      USE_ORIENT = true;
+      var baseBeta = null, baseGamma = null;
+
+      window.addEventListener('deviceorientation', function (e) {
+        if (e.beta === null || e.gamma === null) return;
+
+        /* Calibrate on the first reading — wherever the user is holding the
+           phone at that moment becomes the pupil-centered neutral position.  */
+        if (baseBeta === null) {
+          baseBeta  = e.beta;
+          baseGamma = e.gamma;
+          return;
+        }
+
+        var gx = e.gamma - baseGamma;   /* left/right delta from neutral     */
+        var gy = e.beta  - baseBeta;    /* fwd/back  delta from neutral      */
+
+        orientX = Math.max(-MAX_R, Math.min(MAX_R, (gx / TILT_DEG) * MAX_R));
+        orientY = Math.max(-MAX_R, Math.min(MAX_R, (gy / TILT_DEG) * MAX_R));
+      }, true);
+    }
+
+    function dismissPrompt(el) {
+      el.classList.add('bb-hide');
+      setTimeout(function () { el.parentNode && el.parentNode.removeChild(el); }, 450);
+    }
+
+    function showOrientPrompt() {
+      var el  = document.createElement('button');
+      el.type = 'button';
+      el.id   = 'orient-prompt';
+      el.textContent = '▸ Tap to enable surveillance';
+      document.body.appendChild(el);
+
+      el.addEventListener('click', function () {
+        DeviceOrientationEvent.requestPermission()
+          .then(function (state) {
+            if (state === 'granted') startOrientTracking();
+            dismissPrompt(el);
+          })
+          .catch(function () {
+            el.textContent = '✕ Permission denied';
+            setTimeout(function () { dismissPrompt(el); }, 2000);
+          });
+      });
+    }
+
+    function setupOrientation() {
+      if (!TOUCH || typeof DeviceOrientationEvent === 'undefined') return;
+      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+        showOrientPrompt();          /* iOS 13+ needs a user gesture first  */
+      } else {
+        startOrientTracking();       /* Android + other browsers: just start */
+      }
+    }
+
+    function setupStamps() {
+      var STAMP_SELS = ['.s-welcome', '.s-intro', '.s-army', '.s-war', '.s-who', '.s-darkness-2'];
+      var SKIP = 'a, button, input, select, textarea, [role="button"], label';
+
+      STAMP_SELS.forEach(function (sel) {
+        var sec = document.querySelector(sel);
+        if (!sec) return;
+
+        sec.addEventListener('click', function (e) {
+          if (e.target.closest(SKIP)) return;
+          var r = sec.getBoundingClientRect();
+          var wrap = document.createElement('div');
+          wrap.className = 'eye-stamp';
+          wrap.style.left = (e.clientX - r.left) + 'px';
+          wrap.style.top  = (e.clientY - r.top)  + 'px';
+          wrap.innerHTML  = EYE_HTML;
+          sec.appendChild(wrap);
+          states.push({ wrap: wrap, pupilG: wrap.querySelector('.eye-p'), tx: 0, ty: 0 });
+        });
+      });
+
+      ['.s-forever-1', '.s-forever-2'].forEach(function (sel) {
+        var sec = document.querySelector(sel);
+        if (!sec) return;
+
+        sec.addEventListener('click', function (e) {
+          if (e.target.closest(SKIP)) return;
+          var r = sec.getBoundingClientRect();
+          var el = document.createElement('p');
+          el.className = 'text-stamp';
+          el.textContent = '— for ever.';
+          el.style.left = (e.clientX - r.left) + 'px';
+          el.style.top  = (e.clientY - r.top)  + 'px';
+          sec.appendChild(el);
+        });
+      });
+    }
+
+    function tickGeorge() {
+      if (!georgeSection || !georgeRows.length) return;
+      var r = georgeSection.getBoundingClientRect();
+      if (r.top >= window.innerHeight || r.bottom <= 0) return;
+      var innerScrollable = georgeSection.scrollHeight - georgeSection.clientHeight;
+      var progress = innerScrollable > 0
+        ? Math.min(1, Math.max(0, georgeSection.scrollTop / innerScrollable))
+        : 0;
+      /* inv: 1 = fully spread (scroll start), 0 = fully stacked (scroll end) */
+      var inv = 1 - progress;
+      georgeRows.forEach(function (row, i) {
+        var offset = (i - georgeCenter) * georgeSpread * inv;
+        row.style.transform = 'translateY(' + offset.toFixed(1) + 'px)';
+      });
+    }
+
+    function tickDoublethink() {
+      if (!dtSection || !dtLines.length) return;
+
+      var r = dtSection.getBoundingClientRect();
+      if (r.top >= window.innerHeight || r.bottom <= 0) return;
+
+      /* inner scroll progress: 0 = all stacked, 1 = fully fanned */
+      var innerScrollable = dtSection.scrollHeight - dtSection.clientHeight;
+      var progress = innerScrollable > 0
+        ? Math.min(1, Math.max(0, dtSection.scrollTop / innerScrollable))
+        : 0;
+
+      dtLines.forEach(function (line, i) {
+        var offset = (i - dtCenter) * dtSpread * progress;
+        line.style.transform = 'translateY(' + offset.toFixed(1) + 'px)';
+      });
+    }
+
+    function init() {
+      /* Replace every eye <img> with an inline-SVG <div> */
+      [].slice.call(
+        document.querySelectorAll('.eye-top, .eye, .eye-center, .eye-icon')
+      ).forEach(function (img) {
+        if (img.tagName !== 'IMG') return;
+
+        var wrap = document.createElement('div');
+        wrap.className = img.className;
+        var inlineStyle = img.getAttribute('style');
+        if (inlineStyle) wrap.setAttribute('style', inlineStyle);
+        wrap.innerHTML = EYE_HTML;
+        img.parentNode.replaceChild(wrap, img);
+
+        states.push({ wrap: wrap, pupilG: wrap.querySelector('.eye-p'), tx: 0, ty: 0 });
+      });
+
+      if (!TOUCH) {
+        document.addEventListener('mousemove', function (e) {
+          mx = e.clientX;
+          my = e.clientY;
+        });
+      }
+
+      /* Doublethink fan — measure spread after fonts load */
+      dtSection = document.querySelector('.s-doublethink');
+      if (dtSection) {
+        dtLines  = [].slice.call(dtSection.querySelectorAll('.dt-line'));
+        /* Figma pitch = 155px at 332px font size → ratio 155/332 */
+        dtSpread = dtLines.length
+          ? Math.round(dtLines[0].offsetHeight * 155 / 332)
+          : 0;
+        dtLines.forEach(function (line) {
+          line.style.transform = 'translateY(0px)';
+        });
+      }
+
+      georgeSection = document.querySelector('.s-george');
+      if (georgeSection) {
+        georgeRows   = [].slice.call(georgeSection.querySelectorAll('.george-row'));
+        georgeSpread = georgeRows.length
+          ? Math.round(georgeRows[0].offsetHeight * 1.1)
+          : 0;
+        /* Set initial spread positions so first paint is already correct */
+        georgeRows.forEach(function (row, i) {
+          var offset = (i - georgeCenter) * georgeSpread;
+          row.style.transform = 'translateY(' + offset.toFixed(1) + 'px)';
+        });
+      }
+
+      setupOrientation();
+      setupStamps();
+      requestAnimationFrame(tick);
+    }
+
+    function tick() {
+      states.forEach(function (s) {
+        var r = s.wrap.getBoundingClientRect();
+
+        /* skip eyes on snapped-away sections */
+        if (r.width <= 0 || r.bottom <= 0 || r.top >= window.innerHeight
+            || r.right <= 0 || r.left >= window.innerWidth) return;
+
+        var tx, ty;
+
+        if (USE_ORIENT) {
+          /* All eyes share the same tilt target — device tilts as one unit */
+          tx = orientX;
+          ty = orientY;
+        } else {
+          /* Per-eye: vector from eye centre toward cursor in SVG units */
+          var cx = r.left + r.width  / 2;
+          var cy = r.top  + r.height / 2;
+          var dx = (mx - cx) * (VB_W / r.width);
+          var dy = (my - cy) * (VB_H / r.height);
+          var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+          var c    = Math.min(dist, MAX_R);
+          tx = (dx / dist) * c;
+          ty = (dy / dist) * c;
+        }
+
+        /* lerp — smooth, slightly-lagging feel */
+        s.tx += (tx - s.tx) * LERP;
+        s.ty += (ty - s.ty) * LERP;
+
+        s.pupilG.setAttribute(
+          'transform',
+          'translate(' + s.tx.toFixed(2) + ',' + s.ty.toFixed(2) + ')'
+        );
+      });
+
+      tickGeorge();
+      tickDoublethink();
+      requestAnimationFrame(tick);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  }());
+  </script>
+
+</body>
+</html>
