@@ -451,9 +451,32 @@
     }
 
     .george-inner {
-      /* 300vh animation zone + tunable gap + tunable credit zone */
-      height: calc(300vh + var(--george-gap) + var(--george-credit-h));
+      /* 300vh animation zone + tunable gap + restart zone + tunable credit zone */
+      height: calc(300vh + var(--george-gap) + 8vh + var(--george-credit-h));
       position: relative;
+    }
+
+    .george-restart-zone {
+      height: 8vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .george-restart {
+      font-family: var(--font);
+      font-size: var(--fs-small);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #ffffff;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    .george-restart:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
 
     /* Sticky containing block: 300vh → sticky releases at 200vh (= animation
@@ -768,6 +791,9 @@
       </div>
       <!-- Free-scroll zone: visible after sticky releases -->
       <div class="george-blank-zone"></div>
+      <div class="george-restart-zone">
+        <p class="george-restart" onclick="window.scrollTo(0,0)">Start all over</p>
+      </div>
       <div class="george-credit-zone">
         <p class="george-credit">Inspired by the novel <a href="https://en.wikipedia.org/wiki/Nineteen_Eighty-Four" target="_blank" rel="noopener">Nineteen Eighty-Four</a> by <a href="https://en.wikipedia.org/wiki/George_Orwell" target="_blank" rel="noopener">George Orwell</a></p>
         <p class="george-credit">Designed by <a href="https://linamoreno.com" target="_blank" rel="noopener">Lina Moreno</a>, developed with Claude</p>
