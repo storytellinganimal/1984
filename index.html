@@ -1240,39 +1240,31 @@
           var cx  = e.clientX - r.left;
           var cy  = e.clientY - r.top;
 
-          /* randomise which word goes at cursor, which goes nearby */
-          var first  = Math.random() < 0.5 ? 'white' : 'black';
-          var second = first === 'white' ? 'black' : 'white';
+          /* pick a random pair and randomise which word goes at cursor */
+          var PAIRS = [['white','black'],['right','wrong'],['left','right'],['up','down'],['yes','no']];
+          var pair   = PAIRS[Math.floor(Math.random() * PAIRS.length)];
+          var first  = Math.random() < 0.5 ? pair[0] : pair[1];
+          var second = first === pair[0] ? pair[1] : pair[0];
 
-          /* offset the secondary word in a random direction, ~100–180px away */
-          var angle = Math.random() * Math.PI * 2;
-          var dist  = 100 + Math.random() * 80;
-          var ox    = Math.cos(angle) * dist;
-          var oy    = Math.sin(angle) * dist;
-
-          var mkStamp = function (word, x, y) {
+          var mkStamp = function (word, x, y, cls) {
             var el = document.createElement('p');
-            el.className   = 'wb-stamp ' + (word === 'white' ? 'is-white' : 'is-black');
+            el.className   = 'wb-stamp ' + cls;
             el.textContent = word;
             el.style.left  = x + 'px';
             el.style.top   = y + 'px';
             darknessSec.appendChild(el);
           };
 
-          mkStamp(first,  cx,      cy);
-          mkStamp(second, cx + ox, cy + oy);
+          /* "and" always centered at click */
+          mkStamp('and', cx, cy, '');
 
-          /* "and" — random position near whichever word the user chose */
-          var nearX  = Math.random() < 0.5 ? cx : cx + ox;
-          var nearY  = Math.random() < 0.5 ? cy : cy + oy;
-          var aAngle = Math.random() * Math.PI * 2;
-          var aDist  = 60 + Math.random() * 60;
-          var andEl  = document.createElement('p');
-          andEl.className   = 'wb-stamp';
-          andEl.textContent = 'and';
-          andEl.style.left  = (nearX + Math.cos(aAngle) * aDist) + 'px';
-          andEl.style.top   = (nearY + Math.sin(aAngle) * aDist) + 'px';
-          darknessSec.appendChild(andEl);
+          /* each word of the pair gets its own random offset from "and" */
+          var a1 = Math.random() * Math.PI * 2;
+          var d1 = 100 + Math.random() * 80;
+          var a2 = a1 + Math.PI * (0.5 + Math.random() * 0.5);
+          var d2 = 100 + Math.random() * 80;
+          mkStamp(first,  cx + Math.cos(a1) * d1, cy + Math.sin(a1) * d1, 'is-white');
+          mkStamp(second, cx + Math.cos(a2) * d2, cy + Math.sin(a2) * d2, 'is-black');
 
           darknessSec.classList.toggle('inverted');
           darknessSec.style.fontFamily = darknessSec.classList.contains('inverted')
