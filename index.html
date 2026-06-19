@@ -81,6 +81,13 @@
       color: var(--light);
     }
 
+    /* ─── standard text sections (3,4,5,6,7,9,11) ──
+       Raise --fs-h3 floor so mobile reads close to
+       desktop size; desktop max is unchanged.        */
+    .s-standard {
+      --fs-h3: clamp(32px, 6.88vw, 104px);
+    }
+
     /* ─── shared ─────────────────────────────────── */
     section {
       position: relative;
@@ -107,7 +114,7 @@
     }
 
     /* ═══════════════════════════════════════════════
-       1. INTRO
+       2. INTRO
     ═══════════════════════════════════════════════ */
     .s-intro {
       background-color: var(--dark);
@@ -137,7 +144,7 @@
     }
 
     /* ═══════════════════════════════════════════════
-       3. WELCOME TO 1984
+       1. WELCOME TO 1984
     ═══════════════════════════════════════════════ */
     .s-welcome {
       background-color: var(--light);
@@ -180,7 +187,7 @@
     }
 
     /* ═══════════════════════════════════════════════
-       4. WAR IS PEACE
+       3. WAR IS PEACE
     ═══════════════════════════════════════════════ */
     .s-war {
       background-color: var(--dark);
@@ -199,7 +206,7 @@
     .s-war .w3 { left: 19.97%;         top: 66.60%; width: 37.17%; }
 
     /* ═══════════════════════════════════════════════
-       5. FOR EVER — Part 1
+       4. FOR EVER — Part 1
     ═══════════════════════════════════════════════ */
     .s-forever-1 {
       background-color: var(--light);
@@ -229,7 +236,7 @@
     }
 
     /* ═══════════════════════════════════════════════
-       6. FOR EVER — Part 2
+       5. FOR EVER — Part 2
     ═══════════════════════════════════════════════ */
     .s-forever-2 {
       background-color: var(--light);
@@ -245,7 +252,7 @@
     }
 
     /* ═══════════════════════════════════════════════
-       7. WHO CONTROLS THE FUTURE
+       6. WHO CONTROLS THE FUTURE
     ═══════════════════════════════════════════════ */
     .s-who {
       background-color: var(--dark);
@@ -267,7 +274,7 @@
     }
 
     /* ═══════════════════════════════════════════════
-       8. APRIL
+       7. APRIL
     ═══════════════════════════════════════════════ */
     .s-april {
       background-color: var(--light);
@@ -287,8 +294,9 @@
     .s-april .t2 {
       position: absolute;
       left: calc(66.67% - 0.33%);
-      top: 60.49%;
-      width: 29.43%;
+      right: 4%;
+      bottom: max(4vh, 3rem);
+      width: auto;
       font-size: var(--fs-h3);
       font-weight: 400;
       line-height: 1;
@@ -296,7 +304,7 @@
     }
 
     /* ═══════════════════════════════════════════════
-       10. DOUBLETHINK (masked text texture)
+       8. DOUBLETHINK (masked text texture)
     ═══════════════════════════════════════════════ */
     .s-doublethink {
       background-color: var(--dark);
@@ -334,7 +342,7 @@
     }
 
     /* ═══════════════════════════════════════════════
-       11. DARKNESS — Quote
+       9. DARKNESS — Quote
     ═══════════════════════════════════════════════ */
     .s-darkness {
       background-color: var(--dark);
@@ -401,14 +409,14 @@
     }
 
     /* ═══════════════════════════════════════════════
-       12. DARKNESS — Eyes
+       10. DARKNESS — Eyes
     ═══════════════════════════════════════════════ */
     .s-darkness-2 {
       background-color: var(--dark);
     }
 
     /* ═══════════════════════════════════════════════
-       13. NO DARKNESS
+       11. NO DARKNESS
     ═══════════════════════════════════════════════ */
     .s-nodark {
       background-color: var(--dark);
@@ -436,7 +444,7 @@
     }
 
     /* ═══════════════════════════════════════════════
-       14. GEORGE ORWELL
+       12. GEORGE ORWELL
     ═══════════════════════════════════════════════ */
     .s-george {
       background-color: var(--dark);
@@ -601,7 +609,7 @@
 <body>
 
   <!-- ════════════════════════════════════════════
-       1. INTRO  ·  "Big Brother Is Watching You."
+       1. WELCOME TO 1984
   ════════════════════════════════════════════ -->
   <section class="s-welcome">
     <img class="eye"
@@ -612,7 +620,7 @@
   </section>
 
   <!-- ════════════════════════════════════════════
-       3. INTRO  ·  "Big Brother Is Watching You."
+       2. INTRO  ·  "Big Brother Is Watching You."
   ════════════════════════════════════════════ -->
   <section class="s-intro">
     <img class="eye-top"
@@ -622,18 +630,18 @@
   </section>
 
   <!-- ════════════════════════════════════════════
-       4. WAR IS PEACE
+       3. WAR IS PEACE
   ════════════════════════════════════════════ -->
-  <section class="s-war">
+  <section class="s-war s-standard">
     <p class="w1">War is peace.</p>
     <p class="w2">Freedom is slavery.</p>
     <p class="w3">Ignorance is strength.</p>
   </section>
 
   <!-- ════════════════════════════════════════════
-       5. FOR EVER  Part 1
+       4. FOR EVER  Part 1
   ════════════════════════════════════════════ -->
-  <section class="s-forever-1">
+  <section class="s-forever-1 s-standard">
     <p class="quote">If you want a picture of the future, imagine a boot stamping on a human face</p>
     <div class="forever-stack">
       <p>— for ever.</p>
@@ -644,9 +652,9 @@
   </section>
 
   <!-- ════════════════════════════════════════════
-       6. FOR EVER  Part 2  (scattered phrases)
+       5. FOR EVER  Part 2  (scattered phrases)
   ════════════════════════════════════════════ -->
-  <section class="s-forever-2">
+  <section class="s-forever-2 s-standard">
     <p>— for ever.</p>
     <p>— for ever.</p>
     <p>— for ever.</p>
@@ -658,22 +666,22 @@
   </section>
 
   <!-- ════════════════════════════════════════════
-       7. WHO CONTROLS THE FUTURE
+       6. WHO CONTROLS THE FUTURE
   ════════════════════════════════════════════ -->
-  <section class="s-who">
+  <section class="s-who s-standard">
     <p class="quote">Who controls the past controls the <span class="future-word">future</span>. Who controls the present controls the past.</p>
   </section>
 
   <!-- ════════════════════════════════════════════
-       8. APRIL  ·  opening line
+       7. APRIL  ·  opening line
   ════════════════════════════════════════════ -->
-  <section class="s-april">
+  <section class="s-april s-standard">
     <p class="t1">It was a <span class="april-bright">bright</span> <span class="april-cold">cold</span> <span class="april-daytime">day</span> in <span class="april-month">April</span>,</p>
     <p class="t2">and the clocks were striking thirteen.</p>
   </section>
 
   <!-- ════════════════════════════════════════════
-       10. DOUBLETHINK  ·  text-texture mask
+       8. DOUBLETHINK  ·  text-texture mask
   ════════════════════════════════════════════ -->
   <section class="s-doublethink">
     <div class="dt-inner">
@@ -694,9 +702,9 @@
   </section>
 
   <!-- ════════════════════════════════════════════
-       11. DOUBLETHINK
+       9. DARKNESS — Quote
   ════════════════════════════════════════════ -->
-  <section class="s-darkness">
+  <section class="s-darkness s-standard">
     <p class="dt-quote">
       <span class="word">Doublethink</span> means the power of holding two
       contradictory beliefs in one&#8217;s mind simultaneously, and accepting
@@ -705,7 +713,7 @@
   </section>
 
   <!-- ════════════════════════════════════════════
-       12. EYES
+       10. DARKNESS — Eyes
   ════════════════════════════════════════════ -->
   <section class="s-darkness-2">
     <img class="eye-icon"
@@ -731,14 +739,14 @@
   </section>
 
   <!-- ════════════════════════════════════════════
-       13. "DARKNESS TEXT"
+       11. NO DARKNESS
   ════════════════════════════════════════════ -->
-  <section class="s-nodark">
+  <section class="s-nodark s-standard">
     <p>We shall meet in the place where there is no darkness.</p>
   </section>
 
   <!-- ════════════════════════════════════════════
-       14. GEORGE ORWELL  (repeated, scanline)
+       12. GEORGE ORWELL
   ════════════════════════════════════════════ -->
   <section class="s-george">
     <div class="george-inner">
