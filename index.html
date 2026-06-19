@@ -94,7 +94,7 @@
        values on children switch from % to vh so they stay viewport-
        relative regardless of the section's actual computed height.
 
-       .s-george: overflow-y:auto lets the inner 300vh drive scroll.   */
+       .s-george: overflow-y:auto lets the inner 600vh drive scroll.   */
     .s-george {
       overflow-y: auto;
     }
@@ -390,8 +390,14 @@
     }
 
     .george-inner {
-      height: 300vh;
+      height: 600vh;
       position: relative;
+    }
+
+    /* Sticky containing block: 400vh. Scene sticks until scrollTop 300vh,
+       then releases so blank space + credit scroll into view below. */
+    .george-anim-zone {
+      height: 400vh;
     }
 
     .george-scene {
@@ -402,6 +408,17 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
+    }
+
+    .george-blank-zone {
+      height: 100vh;
+    }
+
+    .george-credit-zone {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .george-row {
@@ -417,13 +434,9 @@
     }
 
     /* ═══════════════════════════════════════════════
-       GEORGE ORWELL CREDIT  (inside .george-scene)
+       GEORGE ORWELL CREDIT  (inside .george-credit-zone, below the sticky)
     ═══════════════════════════════════════════════ */
     .george-credit {
-      position: absolute;
-      bottom: 4rem;
-      left: 50%;
-      transform: translateX(-50%);
       font-size: var(--fs-small);
       letter-spacing: 3.08px;
       text-transform: uppercase;
@@ -663,16 +676,25 @@
   ════════════════════════════════════════════ -->
   <section class="s-george">
     <div class="george-inner">
-      <div class="george-scene">
-        <span class="george-row">George Orwell</span>
-        <span class="george-row">George Orwell</span>
-        <span class="george-row">George Orwell</span>
-        <span class="george-row">George Orwell</span>
-        <span class="george-row">George Orwell</span>
-        <span class="george-row">George Orwell</span>
-        <span class="george-row">George Orwell</span>
-        <span class="george-row">George Orwell</span>
-        <span class="george-row">George Orwell</span>
+      <!-- Animation zone: 400vh sticky containing block.
+           Scene sticks here, converge plays 0→200vh, frozen 200→300vh,
+           then scene releases at 300vh letting the zones below scroll in. -->
+      <div class="george-anim-zone">
+        <div class="george-scene">
+          <span class="george-row">George Orwell</span>
+          <span class="george-row">George Orwell</span>
+          <span class="george-row">George Orwell</span>
+          <span class="george-row">George Orwell</span>
+          <span class="george-row">George Orwell</span>
+          <span class="george-row">George Orwell</span>
+          <span class="george-row">George Orwell</span>
+          <span class="george-row">George Orwell</span>
+          <span class="george-row">George Orwell</span>
+        </div>
+      </div>
+      <!-- Free-scroll zone: visible after sticky releases -->
+      <div class="george-blank-zone"></div>
+      <div class="george-credit-zone">
         <p class="george-credit">Designed &amp; Developed by <a href="#">Lina Moreno</a> in 1984</p>
       </div>
     </div>
@@ -697,10 +719,11 @@
     var dtCenter  = 3;     /* index of middle line (0-based, 7 lines → 3) */
     var dtSpread  = 0;     /* px between adjacent line centres at full fan */
 
-    var georgeSection = null;
-    var georgeRows    = [];
-    var georgeCenter  = 4; /* middle of 9 lines (0-based) */
-    var georgeSpread  = 0;
+    var georgeSection  = null;
+    var georgeRows     = [];
+    var georgeCenter   = 4; /* middle of 9 lines (0-based) */
+    var georgeSpread   = 0;
+    var georgeScrollDir = 0; /* +1 = scrolling down, -1 = up */
 
 /* Inline SVG: static eye body + movable pupil in its own <g class="eye-p"> */
     var EYE_HTML =
@@ -892,9 +915,12 @@
       if (!georgeSection || !georgeRows.length) return;
       var r = georgeSection.getBoundingClientRect();
       if (r.top >= window.innerHeight || r.bottom <= 0) return;
-      var innerScrollable = georgeSection.scrollHeight - georgeSection.clientHeight;
-      var progress = innerScrollable > 0
-        ? Math.min(1, Math.max(0, georgeSection.scrollTop / innerScrollable))
+      /* Cap animation at 2× viewport height (original 200vh travel).
+         Extra scroll beyond that shows blank space + credit without
+         re-opening the spread animation. */
+      var animScrollable = 2 * georgeSection.clientHeight;
+      var progress = animScrollable > 0
+        ? Math.min(1, Math.max(0, georgeSection.scrollTop / animScrollable))
         : 0;
       /* inv: 1 = fully spread (scroll start), 0 = fully stacked (scroll end) */
       var inv = 1 - progress;
@@ -1032,6 +1058,24 @@
           var offset = (i - georgeCenter) * georgeSpread;
           row.style.transform = 'translateY(' + offset.toFixed(1) + 'px)';
         });
+        /* Track outer scroll direction for the IO reset below */
+        window.addEventListener('wheel', function (e) {
+          georgeScrollDir = e.deltaY > 0 ? 1 : -1;
+        }, { passive: true });
+        var georgeTouchY = 0;
+        window.addEventListener('touchstart', function (e) {
+          georgeTouchY = e.touches[0].clientY;
+        }, { passive: true });
+        window.addEventListener('touchmove', function (e) {
+          georgeScrollDir = e.touches[0].clientY < georgeTouchY ? 1 : -1;
+        }, { passive: true });
+        /* Reset inner scroll to top when entering from above (scrolling down)
+           so the converge animation always starts from the spread state. */
+        new IntersectionObserver(function (entries) {
+          if (entries[0].isIntersecting && georgeScrollDir >= 0) {
+            georgeSection.scrollTop = 0;
+          }
+        }, { threshold: 0.95 }).observe(georgeSection);
       }
 
       var nodarkSec = document.querySelector('.s-nodark');
