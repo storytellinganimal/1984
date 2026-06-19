@@ -164,6 +164,21 @@
       text-align: center;
     }
 
+    .s-welcome .scroll-hint {
+      position: absolute;
+      bottom: 3rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font);
+      font-size: var(--fs-small);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--dark);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
     /* ═══════════════════════════════════════════════
        4. WAR IS PEACE
     ═══════════════════════════════════════════════ */
@@ -590,6 +605,7 @@
          src="images/eye.svg"
          alt="">
     <h2>Welcome To The Year Of <span class="year-anim">1984</span><span class="year-cursor">|</span></h2>
+    <p class="scroll-hint">Click anywhere as you scroll.</p>
   </section>
 
   <!-- ════════════════════════════════════════════
@@ -870,12 +886,13 @@
       var whoSec      = document.querySelector('.s-who');
       var futureWord  = whoSec && whoSec.querySelector('.future-word');
       if (whoSec && futureWord) {
-        var futureOpacity = 1;
+        var futureSteps = [0.67, 0.33, 0];
+        var futureStep  = 0;
         whoSec.addEventListener('click', function (e) {
           if (e.target.closest(SKIP)) return;
-          if (futureOpacity > 0) {
-            futureOpacity = Math.max(0, Math.round((futureOpacity - 0.2) * 10) / 10);
-            futureWord.style.opacity = futureOpacity;
+          if (futureStep < futureSteps.length) {
+            futureWord.style.opacity = futureSteps[futureStep];
+            futureStep++;
           } else {
             var r    = whoSec.getBoundingClientRect();
             var wrap = document.createElement('div');
