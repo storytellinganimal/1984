@@ -468,7 +468,7 @@
 
     .george-inner {
       /* 300vh animation zone + tunable gap + restart zone + tunable credit zone */
-      height: calc(300vh + var(--george-gap) + 8vh + var(--george-credit-h));
+      height: calc(300vh + var(--george-gap) + 8vh + 4vh + var(--george-credit-h));
       position: relative;
     }
 
@@ -477,6 +477,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      margin-bottom: 4vh;
     }
 
     .george-restart {
@@ -488,6 +489,7 @@
       color: #ffffff;
       cursor: pointer;
       pointer-events: auto;
+      text-decoration: none;
     }
 
     .george-restart:hover {
@@ -523,7 +525,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 1.4rem;
+      gap: 0.5rem;
       text-align: center;
     }
 
@@ -555,9 +557,13 @@
 
     .george-credit a {
       color: #ffffff;
+      text-decoration: none;
+      pointer-events: auto;
+    }
+
+    .george-credit a:hover {
       text-decoration: underline;
       text-underline-offset: 3px;
-      pointer-events: auto;
     }
 
     /* ─── Responsive tweaks ───────────────────────── */
@@ -779,7 +785,7 @@
       <!-- Free-scroll zone: visible after sticky releases -->
       <div class="george-blank-zone"></div>
       <div class="george-restart-zone">
-        <p class="george-restart" onclick="window.scrollTo(0,0)">Start all over</p>
+        <p class="george-restart" onclick="history.scrollRestoration='manual'; window.scrollTo(0,0); location.reload();">Start all over</p>
       </div>
       <div class="george-credit-zone">
         <p class="george-credit">Inspired by the novel <a href="https://en.wikipedia.org/wiki/Nineteen_Eighty-Four" target="_blank" rel="noopener">Nineteen Eighty-Four</a> by <a href="https://en.wikipedia.org/wiki/George_Orwell" target="_blank" rel="noopener">George Orwell</a></p>
