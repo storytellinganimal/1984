@@ -606,36 +606,7 @@
       height: auto;
     }
 
-    /* ─── iOS orientation permission prompt ─────── */
-    #orient-prompt {
-      position: fixed;
-      bottom: clamp(1.25rem, 5vw, 2rem);
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 0.65em 1.5em;
-      background: var(--dark, #312e2e);
-      color: var(--light, #e9e9e9);
-      border: 1px solid rgba(233,233,233,0.22);
-      font-family: var(--font, 'Terminal Grotesque', sans-serif);
-      font-size: clamp(10px, 2.8vw, 12px);
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      white-space: nowrap;
-      cursor: pointer;
-      z-index: 10000;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-appearance: none;
-      appearance: none;
-      opacity: 1;
-      transition: opacity 0.4s ease;
-    }
-    #orient-prompt.bb-hide {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    /* ─── Year typing cursor ────────────────────── */
+/* ─── Year typing cursor ────────────────────── */
     .year-cursor {
       animation: bb-blink 0.8s step-end infinite;
     }
@@ -854,68 +825,7 @@
     /* ── Touch/mobile detection: coarse pointer + no hover = phone/tablet ── */
     var TOUCH = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
-    /* ── Orientation state (mobile only) ─────────────────────────────────── */
-    var USE_ORIENT = false;
-    var orientX    = 0;   /* target in SVG viewBox units */
-    var orientY    = 0;
-    var TILT_DEG   = 22;  /* degrees of physical tilt → full MAX_R travel    */
-
-    function startOrientTracking() {
-      USE_ORIENT = true;
-      var baseBeta = null, baseGamma = null;
-
-      window.addEventListener('deviceorientation', function (e) {
-        if (e.beta === null || e.gamma === null) return;
-
-        /* Calibrate on the first reading — wherever the user is holding the
-           phone at that moment becomes the pupil-centered neutral position.  */
-        if (baseBeta === null) {
-          baseBeta  = e.beta;
-          baseGamma = e.gamma;
-          return;
-        }
-
-        var gx = e.gamma - baseGamma;   /* left/right delta from neutral     */
-        var gy = e.beta  - baseBeta;    /* fwd/back  delta from neutral      */
-
-        orientX = Math.max(-MAX_R, Math.min(MAX_R, (gx / TILT_DEG) * MAX_R));
-        orientY = Math.max(-MAX_R, Math.min(MAX_R, (gy / TILT_DEG) * MAX_R));
-      }, true);
-    }
-
-    function dismissPrompt(el) {
-      el.classList.add('bb-hide');
-      setTimeout(function () { el.parentNode && el.parentNode.removeChild(el); }, 450);
-    }
-
-    function showOrientPrompt() {
-      var el  = document.createElement('button');
-      el.type = 'button';
-      el.id   = 'orient-prompt';
-      el.textContent = '▸ Tap to enable surveillance';
-      document.body.appendChild(el);
-
-      el.addEventListener('click', function () {
-        DeviceOrientationEvent.requestPermission()
-          .then(function (state) {
-            if (state === 'granted') startOrientTracking();
-            dismissPrompt(el);
-          })
-          .catch(function () {
-            el.textContent = '✕ Permission denied';
-            setTimeout(function () { dismissPrompt(el); }, 2000);
-          });
-      });
-    }
-
-    function setupOrientation() {
-      if (!TOUCH || typeof DeviceOrientationEvent === 'undefined') return;
-      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-        showOrientPrompt();          /* iOS 13+ needs a user gesture first  */
-      } else {
-        startOrientTracking();       /* Android + other browsers: just start */
-      }
-    }
+    var USE_ORIENT = false; /* orientation tracking disabled — pupils follow tap/mouse */
 
     function setupStamps() {
       var STAMP_SELS = ['.s-welcome', '.s-intro', '.s-darkness-2', '.s-george'];
@@ -1235,6 +1145,16 @@
         my = e.clientY;
       });
 
+      /* On touch devices, update mx/my on tap so pupils track the finger */
+      document.addEventListener('touchstart', function (e) {
+        mx = e.touches[0].clientX;
+        my = e.touches[0].clientY;
+      }, { passive: true });
+      document.addEventListener('touchmove', function (e) {
+        mx = e.touches[0].clientX;
+        my = e.touches[0].clientY;
+      }, { passive: true });
+
       /* Doublethink fan — measure spread after fonts load */
       dtSection = document.querySelector('.s-doublethink');
       if (dtSection) {
@@ -1363,7 +1283,6 @@
       }
 
       setupYearAnim();
-      setupOrientation();
       setupStamps();
       requestAnimationFrame(tick);
     }
@@ -1376,23 +1295,15 @@
         if (r.width <= 0 || r.bottom <= 0 || r.top >= window.innerHeight
             || r.right <= 0 || r.left >= window.innerWidth) return;
 
-        var tx, ty;
-
-        if (USE_ORIENT) {
-          /* All eyes share the same tilt target — device tilts as one unit */
-          tx = orientX;
-          ty = orientY;
-        } else {
-          /* Per-eye: vector from eye centre toward cursor in SVG units */
-          var cx = r.left + r.width  / 2;
-          var cy = r.top  + r.height / 2;
-          var dx = (mx - cx) * (VB_W / r.width);
-          var dy = (my - cy) * (VB_H / r.height);
-          var dist = Math.sqrt(dx * dx + dy * dy) || 1;
-          var c    = Math.min(dist, MAX_R);
-          tx = (dx / dist) * c;
-          ty = (dy / dist) * c;
-        }
+        /* Per-eye: vector from eye centre toward cursor / last touch in SVG units */
+        var cx = r.left + r.width  / 2;
+        var cy = r.top  + r.height / 2;
+        var dx = (mx - cx) * (VB_W / r.width);
+        var dy = (my - cy) * (VB_H / r.height);
+        var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        var c    = Math.min(dist, MAX_R);
+        var tx = (dx / dist) * c;
+        var ty = (dy / dist) * c;
 
         /* lerp — smooth, slightly-lagging feel */
         s.tx += (tx - s.tx) * LERP;
