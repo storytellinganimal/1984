@@ -996,68 +996,84 @@
           for (var i = 0; i < stamps.length; i++) stamps[i].textContent = t;
         }, 1000);
 
-        var aprilClicked = false;
+        var aprilClickCount = 0;
+
+        function applyAprilVars() {
+          var now  = new Date();
+          var h    = now.getHours();
+          var m    = now.getMonth();
+          var d    = now.getDate();
+          var snap = aprilClickCount;
+
+          var monthEl   = aprilSec.querySelector('.april-month');
+          var t2El      = aprilSec.querySelector('.t2');
+          var daytimeEl = aprilSec.querySelector('.april-daytime');
+          var brightEl  = aprilSec.querySelector('.april-bright');
+          var coldEl    = aprilSec.querySelector('.april-cold');
+
+          if (monthEl) monthEl.textContent = MONTHS[m];
+          if (t2El)    t2El.textContent    = t2El.textContent.replace('thirteen', HOUR_WORDS[h]);
+
+          var isNight = (h >= 20 || h <= 5);
+          if (daytimeEl) daytimeEl.textContent = isNight ? 'night' : 'day';
+          if (brightEl && isNight) brightEl.textContent = 'dark';
+
+          var isSummer = (m > 4 || (m === 4 && d >= 15))
+                      && (m < 8 || (m === 8 && d <= 15));
+          if (coldEl && isSummer) {
+            coldEl.textContent = 'warm';
+          } else if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (pos) {
+              if (aprilClickCount !== snap) return;
+              var lat = pos.coords.latitude.toFixed(4);
+              var lon = pos.coords.longitude.toFixed(4);
+              fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat
+                  + '&longitude=' + lon + '&current=temperature_2m,weather_code')
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                  if (aprilClickCount !== snap) return;
+                  var temp = data.current.temperature_2m;
+                  var code = data.current.weather_code;
+                  if (coldEl) coldEl.textContent = temp <= 12 ? 'cold' : temp <= 19 ? 'cool' : 'warm';
+                  if (brightEl && !isNight) {
+                    var w;
+                    if      (code <= 1)  w = 'bright';
+                    else if (code === 2) w = 'cloudy';
+                    else if (code === 3) w = 'overcast';
+                    else if (code <= 48) w = 'foggy';
+                    else if (code <= 57) w = 'grey';
+                    else if (code <= 67) w = 'rainy';
+                    else if (code <= 77) w = 'snowy';
+                    else if (code <= 82) w = 'rainy';
+                    else if (code <= 86) w = 'snowy';
+                    else                 w = 'stormy';
+                    brightEl.textContent = w;
+                  }
+                })
+                .catch(function () {});
+            }, function () {});
+          }
+        }
+
+        function restoreApril() {
+          var brightEl  = aprilSec.querySelector('.april-bright');
+          var coldEl    = aprilSec.querySelector('.april-cold');
+          var daytimeEl = aprilSec.querySelector('.april-daytime');
+          var monthEl   = aprilSec.querySelector('.april-month');
+          var t2El      = aprilSec.querySelector('.t2');
+          if (brightEl)  brightEl.textContent  = 'bright';
+          if (coldEl)    coldEl.textContent    = 'cold';
+          if (daytimeEl) daytimeEl.textContent = 'day';
+          if (monthEl)   monthEl.textContent   = 'April';
+          if (t2El)      t2El.textContent      = 'and the clocks were striking thirteen.';
+        }
+
         aprilSec.addEventListener('click', function (e) {
           if (e.target.closest(SKIP)) return;
+          aprilClickCount++;
 
-          if (!aprilClicked) {
-            aprilClicked = true;
-            var now     = new Date();
-            var h       = now.getHours();
-            var m       = now.getMonth(); /* 0-indexed: May=4, Sept=8 */
-            var d       = now.getDate();
-
-            /* month + clock word */
-            var monthEl = aprilSec.querySelector('.april-month');
-            var t2      = aprilSec.querySelector('.t2');
-            if (monthEl) monthEl.textContent = MONTHS[now.getMonth()];
-            if (t2)      t2.textContent = t2.textContent.replace('thirteen', HOUR_WORDS[h]);
-
-            /* day / night */
-            var isNight   = (h >= 20 || h <= 5);
-            var daytimeEl = aprilSec.querySelector('.april-daytime');
-            if (daytimeEl) daytimeEl.textContent = isNight ? 'night' : 'day';
-
-            /* bright → dark immediately if night */
-            var brightEl = aprilSec.querySelector('.april-bright');
-            if (brightEl && isNight) brightEl.textContent = 'dark';
-
-            /* cold / warm — date-based season first, then API */
-            var coldEl   = aprilSec.querySelector('.april-cold');
-            var isSummer = (m > 4 || (m === 4 && d >= 15))
-                        && (m < 8 || (m === 8 && d <= 15));
-            if (coldEl && isSummer) {
-              coldEl.textContent = 'warm';
-            } else if (navigator.geolocation) {
-              navigator.geolocation.getCurrentPosition(function (pos) {
-                var lat = pos.coords.latitude.toFixed(4);
-                var lon = pos.coords.longitude.toFixed(4);
-                fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat
-                    + '&longitude=' + lon + '&current=temperature_2m,weather_code')
-                  .then(function (r) { return r.json(); })
-                  .then(function (data) {
-                    var temp = data.current.temperature_2m;
-                    var code = data.current.weather_code;
-                    if (coldEl) coldEl.textContent = temp <= 12 ? 'cold' : temp <= 19 ? 'cool' : 'warm';
-                    if (brightEl && !isNight) {
-                      var w;
-                      if      (code <= 1)  w = 'bright';
-                      else if (code === 2) w = 'cloudy';
-                      else if (code === 3) w = 'overcast';
-                      else if (code <= 48) w = 'foggy';
-                      else if (code <= 57) w = 'grey';
-                      else if (code <= 67) w = 'rainy';
-                      else if (code <= 77) w = 'snowy';
-                      else if (code <= 82) w = 'rainy';
-                      else if (code <= 86) w = 'snowy';
-                      else                 w = 'stormy';
-                      brightEl.textContent = w;
-                    }
-                  })
-                  .catch(function () {});
-              }, function () {});
-            }
-          }
+          if      (aprilClickCount % 3 === 0) restoreApril();
+          else if (aprilClickCount % 3 === 1) applyAprilVars();
 
           var r  = aprilSec.getBoundingClientRect();
           var el = document.createElement('p');
