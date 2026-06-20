@@ -1308,10 +1308,11 @@
           mkStamp('and', cx, cy, '');
 
           /* each word of the pair gets its own independent random offset from "and" */
+          var isMobile = window.innerWidth <= 768;
           var a1 = Math.random() * Math.PI * 2;
-          var d1 = 80 + Math.random() * 180;
+          var d1 = isMobile ? (30 + Math.random() * 60) : (80 + Math.random() * 180);
           var a2 = a1 + Math.PI * (0.5 + Math.random() * 0.5);
-          var d2 = 80 + Math.random() * 180;
+          var d2 = isMobile ? (30 + Math.random() * 60) : (80 + Math.random() * 180);
           mkStamp(first,  cx + Math.cos(a1) * d1, cy + Math.sin(a1) * d1, 'is-white');
           mkStamp(second, cx + Math.cos(a2) * d2, cy + Math.sin(a2) * d2, 'is-black');
         });
