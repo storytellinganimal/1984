@@ -227,7 +227,7 @@
     .s-forever-1 .forever-stack {
       position: absolute;
       left: calc(4.23% + clamp(0px, calc(12.44% + 3.1vw), calc(12.44% + 47px)));
-      top: 55%;
+      top: 43%;
       display: flex;
       flex-direction: column;
       font-size: var(--fs-h3);
@@ -573,6 +573,7 @@
       .s-war .w3 { left: 4%;                           }
       .s-april .t2 { left: auto; right: 4%; width: 45%; }
       .s-nodark p { max-width: 90%; }
+      .s-forever-1 .forever-stack { top: 36%; }
       .george-credit-zone { padding-bottom: 4rem; }
     }
 
@@ -938,8 +939,6 @@
           var h    = now.getHours();
           var m    = now.getMonth();
           var d    = now.getDate();
-          var snap = aprilClickCount;
-
           var monthEl   = aprilSec.querySelector('.april-month');
           var t2El      = aprilSec.querySelector('.t2');
           var daytimeEl = aprilSec.querySelector('.april-daytime');
@@ -959,14 +958,12 @@
             coldEl.textContent = 'warm';
           } else if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function (pos) {
-              if (aprilClickCount !== snap) return;
               var lat = pos.coords.latitude.toFixed(4);
               var lon = pos.coords.longitude.toFixed(4);
               fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat
                   + '&longitude=' + lon + '&current=temperature_2m,weather_code')
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
-                  if (aprilClickCount !== snap) return;
                   var temp = data.current.temperature_2m;
                   var code = data.current.weather_code;
                   if (coldEl) coldEl.textContent = temp <= 12 ? 'cold' : temp <= 19 ? 'cool' : 'warm';
@@ -990,25 +987,11 @@
           }
         }
 
-        function restoreApril() {
-          var brightEl  = aprilSec.querySelector('.april-bright');
-          var coldEl    = aprilSec.querySelector('.april-cold');
-          var daytimeEl = aprilSec.querySelector('.april-daytime');
-          var monthEl   = aprilSec.querySelector('.april-month');
-          var t2El      = aprilSec.querySelector('.t2');
-          if (brightEl)  brightEl.textContent  = 'bright';
-          if (coldEl)    coldEl.textContent    = 'cold';
-          if (daytimeEl) daytimeEl.textContent = 'day';
-          if (monthEl)   monthEl.textContent   = 'April';
-          if (t2El)      t2El.textContent      = 'and the clocks were striking thirteen.';
-        }
-
         aprilSec.addEventListener('click', function (e) {
           if (e.target.closest(SKIP)) return;
           aprilClickCount++;
 
-          if      (aprilClickCount % 3 === 0) restoreApril();
-          else if (aprilClickCount % 3 === 1) applyAprilVars();
+          if (aprilClickCount === 1) applyAprilVars();
 
           var r  = aprilSec.getBoundingClientRect();
           var el = document.createElement('p');
